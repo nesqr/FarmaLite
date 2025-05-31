@@ -37,7 +37,7 @@
         }
         .hero {
             text-align: center;
-            padding: 3rem 1rem;
+            padding: 3rem 1rem 2rem 1rem;
             background-color: #e9ecef;
         }
         .hero h1 {
@@ -104,7 +104,7 @@
         body.font-extra-large { font-size: 20px; }
         .search-bar {
             max-width: 500px;
-            margin: 1rem auto 4rem auto;
+            margin: 1rem auto 6rem auto;
         }
     </style>
 </head>
@@ -187,10 +187,8 @@
                     .catch(err => console.log('Error en Service Worker:', err));
             });
         }
-        // Script inline pa' modo oscuro y tamaño de fuente
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Inline script: Inicializando...');
-            // Modo oscuro
             const toggleDarkMode = document.getElementById('toggle-dark-mode');
             if (toggleDarkMode) {
                 if (localStorage.getItem('darkMode') === 'enabled') {
@@ -209,7 +207,6 @@
             } else {
                 console.error('Botón toggle-dark-mode no encontrado');
             }
-            // Tamaño de fuente
             const fontSizeLinks = document.querySelectorAll('.font-size-option');
             if (fontSizeLinks.length > 0) {
                 const fontSizes = {
