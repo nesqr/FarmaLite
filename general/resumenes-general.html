@@ -142,11 +142,7 @@
     </nav>
     <main class="container">
         <h2>Resúmenes - Farmacología General</h2>
-        <h3>Sistema Nervioso Central</h3>
-        <p><strong>Resumen:</strong></p>
-        <p>- <strong>Conceptos clave:</strong> El sistema nervioso central (SNC) regula funciones vitales mediante neurotransmisores.<br>
-           - <strong>Fármacos principales:</strong> Benzodiacepinas, antiepilépticos, analgésicos opioides.<br>
-           - <strong>Mecanismos de acción:</strong> Modulan receptores GABA, canales iónicos, o receptores opioides.</p>
+        <p>Contenido de Resúmenes de Farmacología General en construcción...</p>
         <div>
             <a href="../index.html" class="btn btn-outline-primary btn-sm">🏠 Inicio</a>
         </div>
@@ -165,10 +161,8 @@
                     .catch(err => console.log('Error en Service Worker:', err));
             });
         }
-        // Script inline pa' modo oscuro y tamaño de fuente
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Inline script: Inicializando...');
-            // Modo oscuro
             const toggleDarkMode = document.getElementById('toggle-dark-mode');
             if (toggleDarkMode) {
                 if (localStorage.getItem('darkMode') === 'enabled') {
@@ -187,7 +181,6 @@
             } else {
                 console.error('Botón toggle-dark-mode no encontrado');
             }
-            // Tamaño de fuente
             const fontSizeLinks = document.querySelectorAll('.font-size-option');
             if (fontSizeLinks.length > 0) {
                 const fontSizes = {
