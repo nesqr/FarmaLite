@@ -1,46 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>FarmaLite</title>
   <style>
+    :root {
+      --bg: #f4f4f4;
+      --fg: #222;
+      --btn-blue: #4A90E2;
+      --btn-red: #D0021B;
+      --hover: #333;
+    }
     body {
-      font-family: sans-serif;
-      background: #f9f9f9;
-      color: #333;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--fg);
+      margin: 0;
+      padding: 2rem;
       text-align: center;
-      padding: 20px;
     }
     h1 {
-      font-size: 24px;
-      margin-bottom: 16px;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .sub {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 2rem;
     }
     .btn {
-      display: block;
       width: 90%;
       max-width: 300px;
-      margin: 12px auto;
       padding: 16px;
+      margin: 10px auto;
       font-size: 18px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       color: white;
       cursor: pointer;
+      transition: transform 0.2s;
     }
-    .general { background: #4A90E2; }
-    .clinica { background: #D0021B; }
+    .btn:hover {
+      transform: scale(1.03);
+    }
+    .general {
+      background-color: var(--btn-blue);
+    }
+    .clinica {
+      background-color: var(--btn-red);
+    }
+    .lang {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #888;
+      text-decoration: underline;
+    }
     footer {
-      margin-top: 30px;
-      font-size: 12px;
-      color: #777;
+      margin-top: 3rem;
+      font-size: 0.8rem;
+      color: #999;
     }
   </style>
 </head>
 <body>
   <h1>FarmaLite 📘💊</h1>
+  <div class="sub">Una app beta, hecha con amor, megas contados y esperanza... como todo en Cuba 😅</div>
+
   <button class="btn general" onclick="location.href='general.html'">Farmacología General</button>
   <button class="btn clinica" onclick="location.href='clinica.html'">Farmacología Clínica</button>
-  <footer>Hecho con ❤️ en Cuba</footer>
+
+  <div class="lang" onclick="alert('🔤 Cambio de idioma próximamente disponible')">🌐 Cambiar idioma</div>
+
+  <footer>
+    FarmaLite Beta 1.0 — Hecho con ❤️ en Cuba<br>
+    Si esto funciona en iOS, merezco el Nobel 😎
+  </footer>
 </body>
 </html>
