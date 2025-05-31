@@ -1,40 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('FarmaLite: Scripts cargando...');
 
-    // Modo oscuro
-    const toggleDarkMode = document.getElementById('toggle-dark-mode');
-    const body = document.body;
-
-    if (toggleDarkMode) {
-        console.log('Botón modo oscuro encontrado');
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            body.classList.add('dark-mode');
-            toggleDarkMode.textContent = '🌓 Modo Claro';
-            toggleDarkMode.classList.replace('btn-outline-light', 'btn-outline-secondary');
-        } else {
-            toggleDarkMode.textContent = '🌓 Modo Oscuro';
-            toggleDarkMode.classList.replace('btn-outline-secondary', 'btn-outline-light');
-        }
-
-        toggleDarkMode.addEventListener('click', () => {
-            console.log('Alternando modo oscuro');
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                toggleDarkMode.textContent = '🌓 Modo Claro';
-                toggleDarkMode.classList.replace('btn-outline-light', 'btn-outline-secondary');
-                localStorage.setItem('darkMode', 'enabled');
-            } else {
-                toggleDarkMode.textContent = '🌓 Modo Oscuro';
-                toggleDarkMode.classList.replace('btn-outline-secondary', 'btn-outline-light');
-                localStorage.setItem('darkMode', 'disabled');
-            }
-        });
-    } else {
-        console.error('Error: Botón toggle-dark-mode no encontrado');
-    }
-
     // Tamaño de fuente
-    const fontSizeLinks = document.querySelectorAll('.dropdown-item[data-font]');
+    const fontSizeLinks = document.querySelectorAll('.font-size-option');
+    const body = document.body;
     const fontSizes = {
         'small': 'font-small',
         'normal': 'font-normal',
