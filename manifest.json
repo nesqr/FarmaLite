@@ -1,19 +1,19 @@
 {
     "name": "FarmaLite",
     "short_name": "FarmaLite",
-    "description": "Una app beta para estudiantes de farmacología, hecha con amor en Cuba 📘💊",
+    "description": "Una app beta para estudiantes de farmacología en Cuba",
     "start_url": "/index.html",
     "display": "standalone",
     "background_color": "#f8f9fa",
-    "theme_color": "#007bff",
+    "theme_color": "#2c5282",
     "icons": [
         {
-            "src": "/assets/images/icon-192.png",
+            "src": "/icons/icon-192x192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/assets/images/icon-512.png",
+            "src": "/icons/icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png"
         }
