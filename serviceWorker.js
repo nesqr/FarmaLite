@@ -1,9 +1,9 @@
-const CACHE_NAME = 'farma-lite-cache-v2';
+const CACHE_NAME = 'farma-lite-cache-v1.6';
 const urlsToCache = [
     '/',
     '/index.html',
     '/js/app.js',
-    '/manifest.json',
+    '/manifest.jsonnet',
     '/general/resumenes-general.html',
     '/general/clasificacion-general.html',
     '/general/mnemotecnicos-general.html',
