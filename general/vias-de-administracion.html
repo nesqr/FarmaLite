@@ -1,0 +1,551 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Vías de administración de medicamentos - FarmaLite">
+    <meta name="keywords" content="farmacología, vías de administración, medicamentos, formas farmacéuticas">
+    <meta name="author" content="FarmaLite Team">
+    <title>Vías de Administración - FarmaLite</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="manifest" href="../manifest.json">
+    <style>
+        :root {
+            --font-size: clamp(14px, 2.5vw, 16px);
+            --primary-color: #2c5282;
+            --primary-dark: #1a365d;
+            --hover-color: #1e3b61;
+        }
+        body {
+            font-size: var(--font-size);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .navbar, .card, .btn, .footer, .index-card {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar {
+            background-color: var(--primary-color) !important;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: var(--hover-color) !important;
+        }
+        body.dark-mode .navbar {
+            background-color: var(--primary-dark) !important;
+        }
+        body.dark-mode .card, body.dark-mode .index-card {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        body.dark-mode .card-header, body.dark-mode .index-card-header {
+            background-color: var(--primary-dark);
+            color: #e0e0e0;
+        }
+        body.dark-mode .btn-outline-primary {
+            color: #a3cffa;
+            border-color: #a3cffa;
+        }
+        body.dark-mode .btn-outline-primary:hover {
+            background-color: #a3cffa;
+            color: #1a1a1a;
+        }
+        body.dark-mode .footer {
+            background-color: var(--primary-dark) !important;
+            color: #e0e0e0 !important;
+        }
+        .font-small {
+            font-size: clamp(12px, 2vw, 14px) !important;
+        }
+        .font-normal {
+            font-size: clamp(14px, 2.5vw, 16px) !important;
+        }
+        .font-large {
+            font-size: clamp(16px, 3vw, 18px) !important;
+        }
+        .card-header, .index-card-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .index-card {
+            position: sticky;
+            top: 70px;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            z-index: 1000;
+        }
+        .index-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .index-card ul ul {
+            padding-left: 20px;
+        }
+        .index-card a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .index-card a:hover {
+            color: var(--hover-color);
+            text-decoration: underline;
+        }
+        body.dark-mode .index-card a {
+            color: #a3cffa;
+        }
+        body.dark-mode .index-card a:hover {
+            color: #90cdf4;
+        }
+        @media (max-width: 992px) {
+            .index-card {
+                position: static;
+            }
+        }
+        @media (max-width: 576px) {
+            .container {
+                padding: clamp(12px, 3vw, 16px);
+            }
+            h2 {
+                font-size: clamp(1.6rem, 5vw, 2rem);
+            }
+            .index-card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="font-normal">
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../index.html">FarmaLite</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="generalDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Farmacología General
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="generalDropdown">
+                            <li><a class="dropdown-item" href="res-general.html">📄 Resúmenes</a></li>
+                            <li><a class="dropdown-item" href="vias-de-administracion.html">📄 Vías de Administración</a></li>
+                            <li><a class="dropdown-item" href="clasificacion-general.html">🧪 Clasificación de Fármacos</a></li>
+                            <li><a class="dropdown-item" href="mnemotecnicos-general.html">🧠 Trucos Mnemotécnicos</a></li>
+                            <li><a class="dropdown-item" href="autoevaluacion-general.html">✅ Autoevaluación</a></li>
+                            <li><a class="dropdown-item" href="notas-general.html">💬 Notas Útiles</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="clinicaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Farmacología Clínica
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="clinicaDropdown">
+                            <li><a class="dropdown-item" href="../clinica/resumenes-clinica.html">📄 Resúmenes</a></li>
+                            <li><a class="dropdown-item" href="../clinica/clasificacion-clinica.html">🧪 Clasificación</a></li>
+                            <li><a class="dropdown-item" href="../clinica/mnemotecnicos-clinica.html">🧠 Mnemotécnicos</a></li>
+                            <li><a class="dropdown-item" href="../clinica/autoevaluacion-clinica.html">✅ Autoevaluación</a></li>
+                            <li><a class="dropdown-item" href="../clinica/notas-clinica.html">💬 Notas Útiles</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2">🌙 Modo Oscuro</button>
+                    <select id="fontSizeSelect" class="form-select form-select-sm" style="width: auto;">
+                        <option value="font-small">Pequeña</option>
+                        <option value="font-normal" selected>Normal</option>
+                        <option value="font-large">Grande</option>
+                    </select>
+                    <a href="../idioma.html" class="btn btn-outline-light btn-sm ms-2">🌐 Idioma</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-5 pt-3">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="index-card mb-4">
+                    <div class="index-card-header">
+                        Índice
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><a href="#generalidades">Generalidades</a></li>
+                            <li><a href="#via-topica">Vía Tópica</a>
+                                <ul>
+                                    <li><a href="#topica-presentaciones">Presentaciones</a></li>
+                                    <li><a href="#topica-ventajas">Ventajas</a></li>
+                                    <li><a href="#topica-desventajas">Desventajas</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#via-oral">Vía Oral</a>
+                                <ul>
+                                    <li><a href="#oral-presentaciones">Presentaciones</a></li>
+                                    <li><a href="#oral-ventajas">Ventajas</a></li>
+                                    <li><a href="#oral-desventajas">Desventajas</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#via-sublingual">Vía Sublingual</a>
+                                <ul>
+                                    <li><a href="#sublingual-presentaciones">Presentaciones</a></li>
+                                    <li><a href="#sublingual-ventajas">Ventajas</a></li>
+                                    <li><a href="#sublingual-desventajas">Desventajas</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#via-rectal">Vía Rectal</a>
+                                <ul>
+                                    <li><a href="#rectal-presentaciones">Presentaciones</a></li>
+                                    <li><a href="#rectal-ventajas">Ventajas</a></li>
+                                    <li><a href="#rectal-desventajas">Desventajas</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#via-parenteral">Vía Parenteral</a>
+                                <ul>
+                                    <li><a href="#parenteral-presentaciones">Presentaciones</a></li>
+                                    <li><a href="#parenteral-ventajas">Ventajas</a></li>
+                                    <li><a href="#parenteral-desventajas">Desventajas</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#via-inhalatoria">Vía Inhalatoria</a>
+                                <ul>
+                                    <li><a href="#inhalatoria-presentaciones">Presentaciones</a></li>
+                                    <li><a href="#inhalatoria-ventajas">Ventajas</a></li>
+                                    <li><a href="#inhalatoria-desventajas">Desventajas</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#via-percutanea">Vía Percutánea</a>
+                                <ul>
+                                    <li><a href="#percutanea-presentaciones">Presentaciones</a></li>
+                                    <li><a href="#percutanea-ventajas">Ventajas</a></li>
+                                    <li><a href="#percutanea-desventajas">Desventajas</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <h2 class="mb-4">Vías de Administración de los Medicamentos y sus Formas Farmacéuticas</h2>
+                
+                <div id="generalidades" class="card mb-4">
+                    <div class="card-header">
+                        Generalidades
+                    </div>
+                    <div class="card-body">
+                        <p>Las sustancias medicamentosas, para ser administradas, se transforman en preparados farmacéuticos, formas farmacéuticas o formas de dosificación, que pueden ser sólidas, líquidas o gaseosas. Los fármacos se aplican para obtener un efecto local (en el sitio de aplicación) o sistémico (en otro sitio), mediante diferentes vías de administración.</p>
+                        <p>Las vías de administración son las formas en que un medicamento contacta con el organismo para ejercer su efecto. Se clasifican en:</p>
+                        <ul>
+                            <li>Externa, tópica o local.</li>
+                            <li>Interna.</li>
+                            <li>Percutánea.</li>
+                        </ul>
+                        <p>Las formas farmacéuticas contienen el producto farmacéutico con una dosificación de principios activos y sustancias auxiliares. Según su preparación, se dividen en:</p>
+                        <ul>
+                            <li><strong>Formas de prescripción</strong>: Preparados galénicos (formulaciones en farmacopeas) o magistrales (elaborados por el farmacéutico según prescripción).</li>
+                            <li><strong>Formas industriales</strong>: Preparaciones fabricadas industrialmente.</li>
+                        </ul>
+                        <p>Dos productos son bioequivalentes si tienen igual biodisponibilidad, alcanzando la circulación general a la misma velocidad y magnitud tras idéntica dosis molar, con efectos similares. La equivalencia farmacéutica implica igual cantidad de principios activos, misma forma farmacéutica y vía, pero no siempre equivalencia terapéutica, debido a diferencias en excipientes o fabricación.</p>
+                        <p>Los medicamentos se denominan por:</p>
+                        <ol>
+                            <li><strong>Nombre químico</strong>: Describe la estructura molecular, largo y complejo, regulado por normas internacionales.</li>
+                            <li><strong>Nombre genérico</strong>: No patentado, sencillo, establecido por la OMS como Denominaciones Comunes Internacionales (DCI), facilita la comunicación entre profesionales. Ejemplo: ticarcilina.</li>
+                            <li><strong>Nombre registrado</strong>: Patentado por el fabricante, un compuesto puede tener múltiples nombres comerciales (ejemplo: Ticar, Ticarpen para ticarcilina).</li>
+                        </ol>
+                        <p>La selección de la vía de administración y forma farmacéutica es crucial para el éxito del tratamiento. Factores a considerar:</p>
+                        <ol>
+                            <li>Efecto terapéutico deseado.</li>
+                            <li>Estado y características del paciente.</li>
+                            <li>Propiedades físico-químicas del medicamento y sus formas farmacéuticas.</li>
+                        </ol>
+                        <p>Ejemplos: La lidocaína es anestésico local por vía tópica o subcutánea, pero antiarrítmico por vía endovenosa. La vía rectal no se usa en diarrea. En niños, se prefieren formas líquidas. En shock, se elige la vía endovenosa. La bencilpenicilina cristalina se administra endovenosa o intramuscular; la procaínica, solo intramuscular. La morfina, antes solo parenteral por baja biodisponibilidad oral, ahora tiene formulaciones orales sólidas y líquidas.</p>
+                    </div>
+                </div>
+
+                <div id="via-topica" class="card mb-4">
+                    <div class="card-header">
+                        Vía Tópica
+                    </div>
+                    <div class="card-body">
+                        <p>Consiste en aplicar medicamentos directamente sobre piel o mucosas de orificios naturales, buscando un efecto local. La epidermis queratinizada permite el paso de drogas liposolubles; la dermis es permeable, y vehículos facilitan la penetración. Factores que afectan la absorción cutánea:</p>
+                        <ol>
+                            <li><strong>Propiedades físico-químicas</strong>: Sustancias liposolubles penetran vía glándulas sudoríparas.</li>
+                            <li><strong>pH</strong>: Ácidos se absorben mejor por la acidez de la piel.</li>
+                            <li><strong>Concentración</strong>: Mayor concentración, mayor absorción.</li>
+                            <li><strong>Estado de la piel</strong>: Lesiones en el estrato córneo aumentan la absorción.</li>
+                            <li><strong>Edad</strong>: Piel infantil, más permeable.</li>
+                            <li><strong>Sitio</strong>: Absorción decrece: detrás de la oreja > dorso del pie > antebrazo > región plantar.</li>
+                            <li><strong>Hidratación</strong>: Piel hidratada (post-baño) incrementa la penetración.</li>
+                            <li><strong>Superficie</strong>: Mayor área, mayor absorción.</li>
+                        </ol>
+                        <p>Las mucosas, muy irrigadas y sin queratina, tienen mayor penetración, pero son sensibles a irritantes y pueden generar efectos sistémicos no deseados.</p>
+                        <p id="topica-ventajas"><strong>Ventajas</strong>: Aplicación directa en el sitio afectado, altas concentraciones locales, técnica sencilla, autoadministrable.</p>
+                        <p id="topica-desventajas"><strong>Desventajas</strong>: Puede ser incómoda o poco estética. No siempre alcanza capas profundas de la piel, requiriendo otra vía para efectos sistémicos. Absorción cutánea en áreas extensas o lesionadas puede causar efectos indeseables; posible irritación local.</p>
+                        <h5 id="topica-presentaciones">Formas farmacéuticas para la vía tópica</h5>
+                        <h6>1. Formas líquidas</h6>
+                        <ol type="a">
+                            <li><strong>Colirios</strong>: Soluciones estériles, isotónicas, pH 6.6-8, poco irritantes, aplicadas en gotas oculares (máximo 2 por aplicación). Técnica: Lavar manos, no tocar el gotero, mirar arriba, instilar, cerrar párpados 1-2 minutos, secar exceso.</li>
+                            <li><strong>Gotas nasales y óticas</strong>: Soluciones para fosas nasales o conducto auditivo externo. Óticas: Calentar frasco en mano a ~40.6°C, inclinar cabeza, enderezar conducto tirando pabellón auricular (arriba/atrás en adultos, abajo/atrás en niños).</li>
+                            <li><strong>Lociones</strong>: Suspensiones o emulsiones aplicadas sin fricción; el solvente deja los principios activos al evaporarse. Agitar antes de usar.</li>
+                            <li><strong>Linimentos</strong>: Soluciones o emulsiones con vehículo acuoso, alcohólico u oleoso, aplicadas con fricción.</li>
+                            <li><strong>Tinturas</strong>: Soluciones alcohólicas o hidroalcohólicas de sustancias químicas, vegetales o animales.</li>
+                            <li><strong>Otros</strong>: Lavados, aerosoles.</li>
+                        </ol>
+                        <h6>2. Formas semisólidas</h6>
+                        <ol type="a">
+                            <li><strong>Ungüentos/pomadas</strong>: Consistencia blanda, untuosa, adherente, con principios activos y excipiente. Contraindicados en lesiones infectadas por favorecer gérmenes anaerobios. En ojos, aplicar línea delgada.</li>
+                            <li><strong>Pastas</strong>: Contienen ~50% polvos, absorben secreciones cutáneas, menos macerantes que ungüentos.</li>
+                            <li><strong>Cremas</strong>: Emulsiones aceite/agua o agua/agua, consistencia semisólida o líquida espesa, más fluidas que ungüentos.</li>
+                            <li><strong>Geles</strong>: Menor contenido sólido, mayor extensibilidad.</li>
+                        </ol>
+                        <h6>3. Formas sólidas</h6>
+                        <ol type="a">
+                            <li><strong>Polvos dérmicos</strong>: Sustancias finamente divididas, mezcladas homogéneamente, aplicadas en piel.</li>
+                            <li><strong>Óvulos vaginales</strong>: Supositorios ovoideos para vagina, preferiblemente nocturnos para acción prolongada. Tabletas vaginales se desintegran para liberar el activo.</li>
+                            <li><strong>Espumas</strong>: Emulsiones en envases presurizados; el gas propelente genera espuma al expulsarse.</li>
+                            <li><strong>Comprimidos bucales</strong>: Disueltos en boca para acción local en mucosa.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div id="via-oral" class="card mb-4">
+                    <div class="card-header">
+                        Vía Oral
+                    </div>
+                    <div class="card-body">
+                        <p>No recomendada en pacientes inconscientes, con reflejo de deglución abolido o vómitos.</p>
+                        <p id="oral-ventajas"><strong>Ventajas</strong>: Cómoda, segura, económica, autoadministrable, no requiere condiciones externas.</p>
+                        <p id="oral-desventajas"><strong>Desventajas</strong>: Absorción irregular por pH gástrico, vaciamiento gástrico o alimentos. Inadecuada para fármacos degradados en el tracto gastrointestinal o en pacientes con vómitos/inconsciencia.</p>
+                        <h5 id="oral-presentaciones">Formas farmacéuticas para la vía oral</h5>
+                        <h6>Formas líquidas</h6>
+                        <p>Soluciones, emulsiones, suspensiones o extractos con principios activos en vehículo adecuado:</p>
+                        <ol>
+                            <li><strong>Soluciones</strong>: Mezcla homogénea de activos disueltos.</li>
+                            <li><strong>Emulsiones</strong>: Líquidos no miscibles dispersos groseramente.</li>
+                            <li><strong>Suspensiones</strong>: Sólidos insolubles dispersos en vehículo; agitar antes de usar.</li>
+                            <li><strong>Extractos</strong>: Tinturas o extractos fluidos.</li>
+                        </ol>
+                        <p>Formas líquidas usuales:</p>
+                        <ul>
+                            <li><strong>Jarabes</strong>: Soluciones acuosas con >80% sacarosa, correctivos del sabor.</li>
+                            <li><strong>Elixires</strong>: Soluciones hidroalcohólicas (~25% alcohol), edulcoradas, enmascaran olor/sabor.</li>
+                            <li><strong>Suspensiones</strong>: Aspecto lechoso, reconstituidas con agua; densas se llaman magma o leche, hidratadas son geles.</li>
+                            <li><strong>Gotas orales</strong>.</li>
+                            <li><strong>Infusiones</strong>: Soluciones acuosas de principios hidrosolubles de material vegetal con agua en ebullición breve.</li>
+                            <li><strong>Decocciones/cocimientos</strong>: Material vegetal hervido en agua 10-15 minutos.</li>
+                            <li><strong>Tinturas</strong>: Soluciones alcohólicas/hidroalcohólicas de principios activos vegetales, animales o químicos.</li>
+                        </ul>
+                        <h6>Formas sólidas</h6>
+                        <ol>
+                            <li><strong>Comprimidos</strong>: Partículas aglomeradas por compresión, con activos y excipientes. Tipos:</li>
+                            <ol type="a">
+                                <li><strong>Capas múltiples/liberación retardada</strong>: Núcleos superpuestos para activos incompatibles o efectos prolongados.</li>
+                                <li><strong>Recubiertos (grageas)</strong>: Con azúcar/polímero para proteger de humedad/aire, enmascarar sabor/olor.</li>
+                                <li><strong>Gastrorresistentes/entéricos</strong>: Resistentes al pH gástrico, se desintegran en intestino; pueden ser de liberación retardada.</li>
+                                <li><strong>Efervescentes</strong>: Con ácido cítrico/bicarbonato, liberan CO₂ en agua, descomponiendo la masa.</li>
+                            </ol>
+                            <p>Comprimidos no recubiertos pueden triturarse; ranurados, dividirse. Otros no, por riesgos de dosificación errónea, inactivación o irritación gástrica.</p>
+                            <li><strong>Cápsulas</strong>: Unidad posológica en cubierta soluble dura/blanda. Tipos:</li>
+                            <ol type="a">
+                                <li><strong>Duras</strong>: Dos medias cápsulas cilíndricas encajadas.</li>
+                                <li><strong>Blandas</strong>: Pieza única, para líquidos oleosos.</li>
+                                <li><strong>Gastrorresistentes</strong>: Duras/blandas con película gastrorresistente o granulados recubiertos.</li>
+                                <li><strong>Liberación modificada</strong>: Con sustancias que alteran velocidad/lugar de liberación.</li>
+                            </ol>
+                            <li><strong>Polvos</strong>: Activo disperso o no en excipiente inerte, para soluciones extemporáneas.</li>
+                            <li><strong>Granulados</strong>: Agregados de polvos con activos/coadyuvantes; efervescentes, recubiertos, gastrorresistentes o liberación modificada.</li>
+                            <li><strong>Liofilizados</strong>: Formas porosas hidrófilas por liofilización de dosis unitarias.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div id="via-sublingual" class="card mb-4">
+                    <div class="card-header">
+                        Vía Sublingual
+                    </div>
+                    <div class="card-body">
+                        <p>Consiste en colocar el medicamento bajo la lengua hasta su absorción. La rica vascularización sublingual y el drenaje a la vena cava superior permiten absorción significativa de fármacos liposolubles, evitando el efecto de primer paso hepático.</p>
+                        <p id="sublingual-ventajas"><strong>Ventajas</strong>: Técnica sencilla, cómoda, no dolorosa, autoadministrable. Efecto más rápido que la vía oral. Exceso de medicamento puede eliminarse si el efecto es intenso.</p>
+                        <p id="sublingual-desventajas"><strong>Desventajas</strong>: Solo para fármacos liposolubles potentes, debido a la pequeña superficie de absorción. Acidez, mal sabor u otras propiedades limitan su uso. No apta para grandes volúmenes o fármacos irritantes.</p>
+                        <h5 id="sublingual-presentaciones">Formas farmacéuticas</h5>
+                        <ol>
+                            <li>Comprimidos.</li>
+                            <li>Gotas.</li>
+                            <li>Aerosoles.</li>
+                        </ol>
+                        <p>El paciente debe mantener el medicamento bajo la lengua sin tragar saliva para maximizar el efecto. Ejemplo: Nitroglicerina para angina.</p>
+                    </div>
+                </div>
+
+                <div id="via-rectal" class="card mb-4">
+                    <div class="card-header">
+                        Vía Rectal
+                    </div>
+                    <div class="card-body">
+                        <p>Consiste en introducir el medicamento en el recto, para acción local (anestésicos, supositorios de glicerina para evacuación) o sistémica (paracetamol antipirético). La rica vascularización y drenaje de venas hemorroidales inferiores a la vena cava inferior evitan parcialmente el primer paso hepático. Sin embargo, la absorción es menos regular que la oral, por menor superficie, contenido líquido y presencia de heces. Microorganismos rectales pueden degradar el fármaco.</p>
+                        <p id="rectal-ventajas"><strong>Ventajas</strong>: Absorción más rápida que la oral, especialmente en líquidos. No dolorosa, útil cuando la vía oral no es viable (fármacos destruidos en estómago/intestino, gastritis, úlceras, vómitos, inconsciencia).</p>
+                        <p id="rectal-desventajas"><strong>Desventajas</strong>: Absorción irregular e incompleta, menos cómoda. Contraindicada en fisura anal, hemorroides inflamadas o diarrea. Defecación inducida por el medicamento interrumpe la absorción.</p>
+                        <h5 id="rectal-presentaciones">Formas farmacéuticas</h5>
+                        <ol>
+                            <li><strong>Supositorios</strong>: Sólidos con base fusible a <37°C. Técnica: Acostarse de lado, pierna superior flexionada, introducir suavemente más allá del esfínter anal interno.</li>
+                            <li><strong>Soluciones/dispersiones rectales</strong>: Enemas, con o sin fármacos.</li>
+                            <li><strong>Pomadas</strong>: Semisólidos con principio activo en base adecuada.</li>
+                        </ol>
+                        <p>Supositorios no deben fraccionarse por distribución no uniforme del activo; si es necesario, cortar longitudinalmente. Ejemplo: Diazepam rectal para convulsiones.</p>
+                    </div>
+                </div>
+
+                <div id="via-parenteral" class="card mb-4">
+                    <div class="card-header">
+                        Vía Parenteral
+                    </div>
+                    <div class="card-body">
+                        <p>Consiste en inyectar medicamentos en tejidos o líquidos corporales, permitiendo dosificación precisa. No es la más usada por su complejidad, costo y necesidad de condiciones asépticas.</p>
+                        <p id="parenteral-ventajas"><strong>Ventajas</strong>: Dosificación exacta, independiente de la conciencia del paciente, útil cuando la vía oral no es viable (fármacos no absorbibles oralmente).</p>
+                        <p id="parenteral-desventajas"><strong>Desventajas</strong>: Riesgo de infección por comunicación con el exterior, costosa, requiere personal entrenado, dolorosa.</p>
+                        <p>Categorías principales:</p>
+                        <h6>Vía Endovenosa</h6>
+                        <p>Medicamento inyectado directamente en la circulación, eliminando absorción, ideal para emergencias. Solo soluciones acuosas o emulsiones de fase externa acuosa; nunca oleosas por riesgo de embolia. Sitios: Venas dorsales de manos, muñecas, antebrazos, subclavia, yugular, cuero cabelludo (lactantes), umbilical (neonatos), piernas/pies (último recurso). Técnica: Lavar manos, desinfectar piel, estabilizar vena, insertar aguja a 35°, aspirar (sangre indica vena correcta), inyectar lentamente, retirar aguja, presionar con algodón estéril.</p>
+                        <p><strong>Ventajas</strong>: Inicio inmediato, controlable, permite grandes volúmenes, útil para fármacos dolorosos/irritantes (ejemplo: diazepam).</p>
+                        <p><strong>Desventajas</strong>: Administración rápida puede causar efectos graves. Extravasación de irritantes genera inflamación/dolor/necrosis. Soluciones oleosas/suspensiones/aired provocan embolismo. Riesgo de transmisión de SIDA/hepatitis, fiebre por pirógenos.</p>
+                        <p>Formas: Infusión continua (concentración constante), intermitente (fármacos inestables), bolo (nivel rápido). Precauciones: Un fármaco por recipiente, evitar mezclas incompatibles, proteger fotosensibles, interrumpir si hay turbidez/cambio de color.</p>
+                        <h6>Vía Intramuscular</h6>
+                        <p>Inyección en músculo (glúteos, vasto externo, deltoides). Técnica: Desinfectar piel, relajar paciente, insertar aguja a 90°, aspirar (sin sangre), inyectar lentamente, masajear con torunda. Absorción más rápida en brazo que glúteos/muslos, mayor en hombres. En niños, preferir recto femoral/vasto lateral. Permite vehículos acuosos/oleosos, soluciones/emulsiones/suspensiones, ideal para absorción lenta (penicilina benzatínica).</p>
+                        <p><strong>Ventajas</strong>: Absorción más rápida que subcutánea, permite volúmenes mayores (1-10 mL) y sustancias irritantes.</p>
+                        <p><strong>Desventajas</strong>: Volúmenes >5 mL causan dolor. Inyección accidental en vena/arteria genera embolismo o efectos indeseables. Sustancias irritantes provocan escaras/abscesos; inyección en nervio ciático, parálisis/atrofia.</p>
+                        <h6>Vía Subcutánea</h6>
+                        <p>Inyección en tejido subcutáneo, poco vascularizado, absorción más lenta. Rica en grasa/terminaciones nerviosas, usada para efectos sistémicos o locales (anestesia). Sitios: Brazos externos, abdomen laxo, muslos anteriores, subescapular. Técnica: Desinfectar, pellizcar piel, aguja a 45°, inyectar lentamente, presionar con algodón. Absorción aumenta con masaje/hialuronidasa, disminuye con vasoconstrictores (adrenalina).</p>
+                        <p><strong>Ventajas</strong>: Permite microcristales/suspensiones/pellets para liberación sostenida (implantes hormonales).</p>
+                        <p><strong>Desventajas</strong>: Volúmenes pequeños (0.5-2 mL) para evitar dolor. Sustancias irritantes causan dolor/necrosis.</p>
+                        <h6>Vía Intradérmica</h6>
+                        <p>Inyección en dermis, bajo epidermis. Sitios: Antebrazos anteriores, subescapular. Volumen pequeño (≤0.1 mL), absorción lenta, genera roncha. Técnica: Desinfectar, aguja a 15° (bisel arriba), inyectar lentamente. Usada para pruebas alérgicas.</p>
+                        <h6>Otras vías parenterales</h6>
+                        <ul>
+                            <li><strong>Intratecal/subaracnoidea</strong>: Inyección en espacio subaracnoideo para acción en meninges/nervios raquídeos (anestésicos, antimicrobianos), supera barrera hematoencefálica.</li>
+                            <li><strong>Epidural</strong>: Menor concentración medular por difusión a través de meninges; usada para anestésicos/analgésicos.</li>
+                            <li><strong>Intraarterial</strong>: Localiza efecto en órgano (diagnósticos, antineoplásicos en cáncer).</li>
+                            <li><strong>Intraarticular</strong>: Inyección en articulación (corticoides), alto riesgo de infección.</li>
+                            <li><strong>Intraperitoneal</strong>: En cavidad peritoneal, rápida difusión, no evita primer paso, riesgo de adherencias/infecciones, no rutinaria.</li>
+                        </ul>
+                        <h5 id="parenteral-presentaciones">Formas farmacéuticas</h5>
+                        <p>Formulaciones estériles para inyección/implantación:</p>
+                        <ol>
+                            <li><strong>Inyectables</strong>: Activo disuelto/emulsionado/suspendido en agua/líquido no acuoso.</li>
+                            <li><strong>Para diluir</strong>: Soluciones concentradas diluidas antes de inyectarse.</li>
+                            <li><strong>Para infusión</strong>: Soluciones/emulsiones isotónicas con sangre.</li>
+                            <li><strong>Polvo para inyectables</strong>: Polvos estériles reconstituidos con solvente.</li>
+                            <li><strong>Implantes</strong>: Dispositivos sólidos de liberación controlada prolongada.</li>
+                        </ol>
+                        <p>Deben ser estériles, libres de pirógenos e isotónicas (soluciones).</p>
+                    </div>
+                </div>
+
+                <div id="via-inhalatoria" class="card mb-4">
+                    <div class="card-header">
+                        Vía Inhalatoria
+                    </div>
+                    <div class="card-body">
+                        <p>Administración de medicamentos por vías respiratorias en aerosoles, vapores o polvos finos, para efecto local (tracto respiratorio) o sistémico (absorción alveolar). Ideal para asma, EPOC, anestesia general o fármacos sistémicos.</p>
+                        <p id="inhalatoria-ventajas"><strong>Ventajas</strong>: Absorción rápida por superficie alveolar y vascularización. Efecto local directo, minimiza efectos sistémicos. Evita primer paso hepático. Autoadministrable con inhaladores.</p>
+                        <p id="inhalatoria-desventajas"><strong>Desventajas</strong>: Requiere técnica correcta. Difícil en niños/ancianos. Posible irritación respiratoria. Dosis limitadas por capacidad de inhalación.</p>
+                        <h5 id="inhalatoria-presentaciones">Formas farmacéuticas</h5>
+                        <ol>
+                            <li><strong>Aerosoles</strong>: Partículas finas en gas propelente, con inhaladores de dosis medida (MDI). Ejemplo: Salbutamol.</li>
+                            <li><strong>Polvos secos</strong>: Inhalados con dispositivos DPI. Ejemplo: Budesonida.</li>
+                            <li><strong>Nebulizaciones</strong>: Soluciones/suspensiones en niebla fina vía nebulizadores. Ejemplo: Ipratropio.</li>
+                            <li><strong>Vapores</strong>: Fármacos gaseosos, como anestésicos (sevoflurano).</li>
+                        </ol>
+                        <p>Técnica: Agitar inhalador, exhalar completamente, inhalar lentamente, retener respiración 5-10 segundos.</p>
+                    </div>
+                </div>
+
+                <div id="via-percutanea" class="card mb-4">
+                    <div class="card-header">
+                        Vía Percutánea
+                    </div>
+                    <div class="card-body">
+                        <p>Administración a través de la piel para efecto sistémico, con absorción a la circulación general, evitando tracto gastrointestinal y primer paso hepático. Usada para liberación prolongada (dolor, terapia hormonal).</p>
+                        <p id="percutanea-ventajas"><strong>Ventajas</strong>: Liberación controlada/sostenida. Evita degradación gástrica/primer paso. Fácil, autoadministrable. Menor frecuencia de administración (parches de días).</p>
+                        <p id="percutanea-desventajas"><strong>Desventajas</strong>: Solo para fármacos liposolubles de baja dosis. Posible irritación/alergia cutánea. Absorción variable por tipo/grosor de piel, hidratación o lesiones. Inicio de acción lento.</p>
+                        <h5 id="percutanea-presentaciones">Formas farmacéuticas</h5>
+                        <ol>
+                            <li><strong>Parches transdérmicos</strong>: Matriz/reservorio con liberación gradual. Ejemplo: Fentanilo, nicotina.</li>
+                            <li><strong>Geles/cremas transdérmicos</strong>: Semisólidos para absorción sistémica. Ejemplo: Testosterona.</li>
+                            <li><strong>Soluciones transdérmicas</strong>: Líquidos aplicados en piel. Ejemplo: Estradiol.</li>
+                        </ol>
+                        <p>Aplicar en piel fina (torso, brazos), rotar sitios para evitar irritación.</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="../index.html" class="btn btn-outline-primary btn-sm">🏠 Inicio</a>
+                    <a href="res-general.html" class="btn btn-outline-primary btn-sm">📄 Resúmenes</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer text-center py-3 mt-5">
+        <p>FarmaLite Beta 1.9.2 — Hecho con ❤️ en Cuba</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../serviceWorker.js')
+                    .then(reg => console.log('Service Worker registrado'))
+                    .catch(err => console.log('Error al registrar Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>
