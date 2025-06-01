@@ -1,0 +1,243 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Resúmenes de Farmacología General - FarmaLite">
+    <meta name="keywords" content="farmacología, resúmenes, principios activos, medicamentos">
+    <meta name="author" content="FarmaLite Team">
+    <title>Resúmenes de Farmacología General - FarmaLite</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="manifest" href="../manifest.json">
+    <style>
+        :root {
+            --font-size: clamp(14px, 2.5vw, 16px);
+            --primary-color: #2c5282;
+            --primary-dark: #1a365d;
+            --hover-color: #1e3b61;
+        }
+        body {
+            font-size: var(--font-size);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .navbar, .card, .btn, .footer {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar {
+            background-color: var(--primary-color) !important;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: var(--hover-color) !important;
+        }
+        body.dark-mode .navbar {
+            background-color: var(--primary-dark) !important;
+        }
+        body.dark-mode .card {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        body.dark-mode .card-header {
+            background-color: var(--primary-dark);
+            color: #e0e0e0;
+        }
+        body.dark-mode .btn-outline-primary {
+            color: #a3cffa;
+            border-color: #a3cffa;
+        }
+        body.dark-mode .btn-outline-primary:hover {
+            background-color: #a3cffa;
+            color: #1a1a1a;
+        }
+        body.dark-mode .footer {
+            background-color: var(--primary-dark) !important;
+            color: #e0e0e0 !important;
+        }
+        .font-small {
+            font-size: clamp(12px, 2vw, 14px) !important;
+        }
+        .font-normal {
+            font-size: clamp(14px, 2.5vw, 16px) !important;
+        }
+        .font-large {
+            font-size: clamp(16px, 3vw, 18px) !important;
+        }
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        @media (max-width: 576px) {
+            .container {
+                padding: clamp(10px, 2vw, 15px);
+            }
+            h2 {
+                font-size: clamp(1.5rem, 5vw, 1.8rem);
+            }
+        }
+    </style>
+</head>
+<body class="font-normal">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../index.html">FarmaLite</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="generalDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Farmacología General
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="generalDropdown">
+                            <li><a class="dropdown-item" href="res-general.html">📄 Resúmenes</a></li>
+                            <li><a class="dropdown-item" href="vias-de-administracion.html">📄 Vías de Administración</a></li>
+                            <li><a class="dropdown-item" href="clasificacion-general.html">🧪 Clasificación de Fármacos</a></li>
+                            <li><a class="dropdown-item" href="mnemotecnicos-general.html">🧠 Trucos Mnemotécnicos</a></li>
+                            <li><a class="dropdown-item" href="autoevaluacion-general.html">✅ Autoevaluación</a></li>
+                            <li><a class="dropdown-item" href="notas-general.html">💬 Notas Útiles</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="clinicaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Farmacología Clínica
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="clinicaDropdown">
+                            <li><a class="dropdown-item" href="../clinica/resumenes-clinica.html">📄 Resúmenes</a></li>
+                            <li><a class="dropdown-item" href="../clinica/clasificacion-clinica.html">🧪 Clasificación</a></li>
+                            <li><a class="dropdown-item" href="../clinica/mnemotecnicos-clinica.html">🧠 Mnemotécnicos</a></li>
+                            <li><a class="dropdown-item" href="../clinica/autoevaluacion-clinica.html">✅ Autoevaluación</a></li>
+                            <li><a class="dropdown-item" href="../clinica/notas-clinica.html">💬 Notas Útiles</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2">🌙 Modo Oscuro</button>
+                    <select id="fontSizeSelect" class="form-select form-select-sm" style="width: auto;">
+                        <option value="font-small">Pequeña</option>
+                        <option value="font-normal" selected>Normal</option>
+                        <option value="font-large">Grande</option>
+                    </select>
+                    <a href="../idioma.html" class="btn btn-outline-light btn-sm ms-2">🌐 Idioma</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h2>Resúmenes de Farmacología General</h2>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Introducción a la Farmacología
+            </div>
+            <div class="card-body">
+                <p>La farmacología es la ciencia que estudia los fármacos, sus propiedades, acciones, mecanismos y efectos en los organismos vivos. Se divide en:</p>
+                <ul>
+                    <li><strong>Farmacodinamia</strong>: Estudia los efectos de los fármacos en el organismo y sus mecanismos de acción.</li>
+                    <li><strong>Farmacocinética</strong>: Analiza la absorción, distribución, metabolismo y excreción de los fármacos.</li>
+                    <li><strong>Farmacoterapia</strong>: Aplica los conocimientos farmacológicos para el tratamiento de enfermedades.</li>
+                </ul>
+                <p>Los fármacos pueden clasificarse según su origen (natural, sintético, semisintético), acción terapéutica o estructura química.</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Principios Activos y Excipientes
+            </div>
+            <div class="card-body">
+                <p><strong>Principio activo</strong>: Sustancia responsable del efecto farmacológico. Ejemplo: Paracetamol (analgésico).</p>
+                <p><strong>Excipiente</strong>: Sustancia inactiva que facilita la administración o estabilidad del fármaco. Ejemplo: Almidón en comprimidos.</p>
+                <p>La biodisponibilidad depende de la vía de administración y la forma farmacéutica (comprimidos, cápsulas, jarabes, etc.).</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                Vías de Administración
+            </div>
+            <div class="card-body">
+                <p>Las vías de administración determinan la velocidad y eficacia de un fármaco. Las principales son:</p>
+                <ul>
+                    <li><strong>Oral</strong>: Cómoda, pero con absorción variable.</li>
+                    <li><strong>Parenteral</strong>: Rápida, incluye endovenosa, intramuscular, subcutánea.</li>
+                    <li><strong>Tópica</strong>: Efecto local en piel o mucosas.</li>
+                    <li><strong>Inhalatoria</strong>: Acción rápida en vías respiratorias.</li>
+                </ul>
+                <p>Consulta la sección detallada en <a href="vias-de-administracion.html">Vías de Administración</a>.</p>
+            </div>
+        </div>
+
+        <div>
+            <a href="../index.html" class="btn btn-outline-primary btn-sm">🏠 Inicio</a>
+            <a href="vias-de-administracion.html" class="btn btn-outline-primary btn-sm">📄 Vías de Administración</a>
+        </div>
+    </main>
+
+    <footer class="footer text-center py-3 mt-4">
+        <p>FarmaLite Beta 1.9.2 — Hecho con ❤️ en Cuba</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../serviceWorker.js')
+                    .then(reg => console.log('Service Worker registrado'))
+                    .catch(err => console.log('Error al registrar Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>
