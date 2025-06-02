@@ -1,36 +1,67 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const fontSizeSelect = document.getElementById('fontSizeSelect');
-    const body = document.body;
+  // Elementos del DOM
+  const darkModeToggle = document.getElementById('darkModeToggle');
+  const fontSizeSelect = document.getElementById('fontSizeSelect');
+  const body = document.body;
 
-    // Cargar preferencias guardadas
-    if (localStorage.getItem('darkMode') === 'enabled') {
-        body.classList.add('dark-mode');
-        darkModeToggle.textContent = '☀️ Modo Claro';
+  // Verificar existencia de elementos
+  if (!darkModeToggle || !fontSizeSelect) {
+    console.error('Elementos darkModeToggle o fontSizeSelect no encontrados');
+    return;
+  }
+
+  // Cargar preferencias guardadas
+  const loadPreferences = () => {
+    const savedDarkMode = localStorage.getItem('darkMode');
+    const savedFontSize = localStorage.getItem('fontSize');
+
+    if (savedDarkMode === 'enabled') {
+      body.classList.add('dark-mode');
+      darkModeToggle.textContent = '☀️ Modo Claro';
     }
 
-    if (localStorage.getItem('fontSize')) {
-        body.classList.remove('font-small', 'font-normal', 'font-large');
-        body.classList.add(localStorage.getItem('fontSize'));
-        fontSizeSelect.value = localStorage.getItem('fontSize');
+    if (savedFontSize) {
+      body.classList.remove('font-small', 'font-normal', 'font-large');
+      body.classList.add(savedFontSize);
+      fontSizeSelect.value = savedFontSize;
     }
+  };
 
-    // Alternar modo oscuro
-    darkModeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        if (body.classList.contains('dark-mode')) {
-            localStorage.setItem('darkMode', 'enabled');
-            darkModeToggle.textContent = '☀️ Modo Claro';
-        } else {
-            localStorage.setItem('darkMode', 'disabled');
-            darkModeToggle.textContent = '🌙 Modo Oscuro';
-        }
-    });
+  // Alternar modo oscuro
+  const toggleDarkMode = () => {
+    try {
+      body.classList.toggle('dark-mode');
+      const isDarkMode = body.classList.contains('dark-mode');
+      darkModeToggle.textContent = isDarkMode ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+      localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+    } catch (err) {
+      console.error('Error al alternar modo oscuro:', err);
+    }
+  };
 
-    // Cambiar tamaño de fuente
-    fontSizeSelect.addEventListener('change', (e) => {
-        body.classList.remove('font-small', 'font-normal', 'font-large');
-        body.classList.add(e.target.value);
-        localStorage.setItem('fontSize', e.target.value);
-    });
+  // Cambiar tamaño de fuente
+  const changeFontSize = () => {
+    try {
+      const selectedFontSize = fontSizeSelect.value;
+      body.classList.remove('font-small', 'font-normal', 'font-large');
+      body.classList.add(selectedFontSize);
+      localStorage.setItem('fontSize', selectedFontSize);
+    } catch (err) {
+      console.error('Error al cambiar tamaño de fuente:', err);
+    }
+  };
+
+  // Inicializar preferencias
+  loadPreferences();
+
+  // Asignar eventos
+  darkModeToggle.addEventListener('click', toggleDarkMode);
+  fontSizeSelect.addEventListener('change', changeFontSize);
+
+  // Preparar para futuras funcionalidades (ej. notificaciones)
+  const initFutureFeatures = () => {
+    // Placeholder para notificaciones o ajustes adicionales
+    console.log('FarmaLite: Inicializando futuras funcionalidades');
+  };
+  initFutureFeatures();
 });
