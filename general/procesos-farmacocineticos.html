@@ -1,0 +1,529 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Procesos farmacocinéticos de medicamentos - FarmaLite">
+    <meta name="keywords" content="farmacocinética, absorción, distribución, metabolismo, excreción">
+    <meta name="author" content="FarmaLite Team">
+    <title>Procesos Farmacocinéticos - FarmaLite</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="manifest" href="../manifest.json">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --font-size: clamp(14px, 2.5vw, 16px);
+            --primary-color: #2c5282;
+            --primary-dark: #1a365d;
+            --hover-color: #1e3b61;
+        }
+        body {
+            font-size: var(--font-size);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .navbar, .card, .btn, .footer, .index-card {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .navbar {
+            background-color: var(--primary-color) !important;
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+        .navbar-brand:hover, .nav-link:hover {
+            color: var(--hover-color) !important;
+        }
+        body.dark-mode .navbar {
+            background-color: var(--primary-dark) !important;
+        }
+        body.dark-mode .card, body.dark-mode .index-card {
+            background-color: #2d2d2d;
+            color: #e0e0e0;
+        }
+        body.dark-mode .card-header, body.dark-mode .index-card-header {
+            background-color: var(--primary-dark);
+            color: #e0e0e0;
+        }
+        body.dark-mode .btn-outline-primary {
+            color: #a3cffa;
+            border-color: #a3cffa;
+        }
+        body.dark-mode .btn-outline-primary:hover {
+            background-color: #a3cffa;
+            color: #1a1a1a;
+        }
+        body.dark-mode .footer {
+            background-color: var(--primary-dark) !important;
+            color: #e0e0e0 !important;
+        }
+        .font-small {
+            font-size: clamp(12px, 2vw, 14px) !important;
+        }
+        .font-normal {
+            font-size: clamp(14px, 2.5vw, 16px) !important;
+        }
+        .font-large {
+            font-size: clamp(16px, 3vw, 18px) !important;
+        }
+        .card-header, .index-card-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .index-card {
+            position: sticky;
+            top: 70px;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            z-index: 1000;
+        }
+        .index-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .index-card ul ul {
+            padding-left: 20px;
+        }
+        .index-card a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .index-card a:hover {
+            color: var(--hover-color);
+            text-decoration: underline;
+        }
+        body.dark-mode .index-card a {
+            color: #a3cffa;
+        }
+        body.dark-mode .index-card a:hover {
+            color: #90cdf4;
+        }
+        @media (max-width: 992px) {
+            .index-card {
+                position: static;
+            }
+        }
+        @media (max-width: 576px) {
+            .container {
+                padding: clamp(12px, 3vw, 16px);
+            }
+            h2 {
+                font-size: clamp(1.6rem, 5vw, 2rem);
+            }
+            .index-card {
+                margin-bottom: 1rem;
+            }
+        }
+        .table {
+            font-size: clamp(12px, 2vw, 14px);
+        }
+        .mathjax {
+            font-size: clamp(14px, 2.5vw, 16px);
+        }
+    </style>
+</head>
+<body class="font-normal">
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../index.html">FarmaLite</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="generalDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Farmacología General
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="generalDropdown">
+                            <li><a class="dropdown-item" href="res-general.html">📄 Resúmenes</a></li>
+                            <li><a class="dropdown-item" href="vias-de-administracion.html">📄 Vías de Administración</a></li>
+                            <li><a class="dropdown-item" href="procesos-farmacocineticos.html">📄 Procesos Farmacocinéticos</a></li>
+                            <li><a class="dropdown-item" href="clasificacion-general.html">🧪 Clasificación de Fármacos</a></li>
+                            <li><a class="dropdown-item" href="mnemotecnicos-general.html">🧠 Trucos Mnemotécnicos</a></li>
+                            <li><a class="dropdown-item" href="autoevaluacion-general.html">✅ Autoevaluación</a></li>
+                            <li><a class="dropdown-item" href="notas-general.html">💬 Notas Útiles</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="clinicaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Farmacología Clínica
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="clinicaDropdown">
+                            <li><a class="dropdown-item" href="../clinica/resumenes-clinica.html">📄 Resúmenes</a></li>
+                            <li><a class="dropdown-item" href="../clinica/clasificacion-clinica.html">🧪 Clasificación</a></li>
+                            <li><a class="dropdown-item" href="../clinica/mnemotecnicos-clinica.html">🧠 Mnemotécnicos</a></li>
+                            <li><a class="dropdown-item" href="../clinica/autoevaluacion-clinica.html">✅ Autoevaluación</a></li>
+                            <li><a class="dropdown-item" href="../clinica/notas-clinica.html">💬 Notas Útiles</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2">🌙 Modo Oscuro</button>
+                    <select id="fontSizeSelect" class="form-select form-select-sm" style="width: auto;">
+                        <option value="font-small">Pequeña</option>
+                        <option value="font-normal" selected>Normal</option>
+                        <option value="font-large">Grande</option>
+                    </select>
+                    <a href="../idioma.html" class="btn btn-outline-light btn-sm ms-2">🌐 Idioma</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-5 pt-3">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="index-card mb-4">
+                    <div class="index-card-header">
+                        Índice
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li><a href="#generalidades">Generalidades</a></li>
+                            <li><a href="#mecanismos-transporte">Mecanismos de Transporte</a>
+                                <ul>
+                                    <li><a href="#transporte-pasivo">Transporte Pasivo</a></li>
+                                    <li><a href="#transporte-activo">Transporte Activo</a></li>
+                                    <li><a href="#atrapamiento-ionico">Atrapamiento Iónico</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#absorcion">Absorción</a>
+                                <ul>
+                                    <li><a href="#factores-absorcion">Factores Generales</a></li>
+                                    <li><a href="#absorcion-vias">Por Vías</a></li>
+                                    <li><a href="#biodisponibilidad">Biodisponibilidad</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#distribucion">Distribución</a>
+                                <ul>
+                                    <li><a href="#etapas-distribucion">Ventajas</a></li>
+                                    <li><a href="#volumen-distribucion">Volumen</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#metabolismo">Metabolismo</a>
+                                <ul>
+                                    <li><a href="#fase-i">Fase I</li>
+                                    <li><a href="#fase-ii">Fase II</a></li>
+                                    <li><a href="#factores-metabolismo">Factores</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#excrecion">Explicación</a>
+                                <ul>
+                                    <li><a href="#excrecion-renal">Renal</a></li>
+                                    <li><a href="#excrecion-biliar">Biliar</a></li>
+                                    <li><a href="#otras-vias">Otras Vías</a></li>
+                                    <li><a href="#aclaramiento">Aclaramiento</a></li>
+                                    <li><a href="#vida-media">Vida Media</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#aplicaciones-clinicas">Aplicaciones Clínicas</a>
+                                <ul>
+                                    <li><a href="#inicio-tratamiento">Inicio</a></li>
+                                    <li><a href="#estado-equilibrio">Equilibrio</a></li>
+                                    <li><a href="#cese-tratamiento">Cese</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <h2 class="mb-4">Procesos Farmacocinéticos de los Medicamentos</h2>
+                
+                <div id="generalidades" class="card mb-4">
+                    <div class="card-header">
+                        Generalidades
+                    </div>
+                    <div class="card-body">
+                        <p>La farmacocinética, definida en 1953 por FH Dost, estudia las relaciones cuantitativas entre el organismo y el medicamento, analizando los procesos de absorción, distribución, metabolismo y excreción. Determina la frecuencia, cantidad, forma de dosificación y duración de la administración para alcanzar y mantener concentraciones plasmáticas terapéuticas.</p>
+                    </div>
+                </div>
+
+                <div id="mecanismos-transporte" class="card mb-4">
+                    <div class="card-header">
+                        Mecanismos de Transporte
+                    </div>
+                    <div class="card-body">
+                        <p>Los fármacos atraviesan membranas celulares mediante biotransporte, utilizando mecanismos pasivos o activos.</p>
+                        <h5 id="transporte-pasivo">Transporte Pasivo</h5>
+                        <p>Depende del gradiente de concentración o cargas eléctricas. Los fármacos liposolubles se disuelven en la bicapa lipídica, atravesando membranas sin canales ni transportadores. La liposolubilidad depende de los grupos polares: menos grupos, mayor liposolubilidad. Los fármacos actúan como ácidos o bases débiles, con equilibrio entre formas no ionizada (liposoluble) e ionizada (menos liposoluble). Para ácidos débiles: \( \text{AH} \leftrightarrow \text{A}^- + \text{H}^+ \). Para bases débiles: \( \text{B} + \text{H}^+ \leftrightarrow \text{BH}^+ \).</p>
+                        <h5 id="transporte-activo">Transporte Activo</h5>
+                        <p>Requiere energía metabólica y macromoléculas transportadoras. Ejemplos: calcio, fluoruracilo, L-dopa. La competencia por transportadores limita la absorción.</p>
+                        <h5 id="atrapamiento-ionico">Atrapamiento Iónico</h5>
+                        <p>En medios con diferente pH, los fármacos se concentran según su ionización. La ecuación de Henderson-Hasselbalch calcula la proporción de formas ionizada/no ionizada:</p>
+                        <p>Para ácidos débiles: \( \text{pKa} = \text{pH} + \log \left( \frac{[\text{AH}]}{[\text{A}^-]} \right) \)</p>
+                        <p>Para bases débiles: \( \text{pKa} = \text{pH} + \log \left( \frac{[\text{BH}^+]}{[\text{B}]} \right) \)</p>
+                        <p>Ejemplo: Un ácido débil en el estómago (pH bajo) está más no ionizado, favoreciendo su absorción hacia el plasma (pH 7.4), donde se ioniza, atrapándose.</p>
+                    </div>
+                </div>
+
+                <div id="absorcion" class="card mb-4">
+                    <div class="card-header">
+                        Absorción
+                    </div>
+                    <div class="card-body">
+                        <p>Es el paso del medicamento desde el sitio de administración al plasma, necesario para alcanzar el sitio de acción, salvo en efectos locales (ej. tópicos).</p>
+                        <h5 id="factores-absorcion">Factores Generales</h5>
+                        <p>La absorción depende de:</p>
+                        <ol>
+                            <li><strong>Velocidad de disolución</strong>: Fármacos solubilizados en forma libre se absorben mejor.</li>
+                            <li><strong>pH del medio</strong>: Afecta la ionización (ver atrapamiento iónico).</li>
+                            <li><strong>Liposolubilidad</strong>: Mayor liposolubilidad, mejor absorción.</li>
+                            <li><strong>Gradiente de concentración</strong>: Mayor diferencia, mayor absorción.</li>
+                        </ol>
+                        <h5 id="absorcion-vias">Absorción por Vías</h5>
+                        <p><strong>Inmediata</strong>: Vía intravenosa, sin atravesar membranas. <strong>Mediata</strong>: Otras vías requieren atravesar barreras biológicas.</p>
+                        <p><strong>Oral</strong>: Absorción principal en intestino, menor en estómago. Depende de liposolubilidad e ionización. Ejemplos con transportadores: levodopa, fluoruracilo. Factores que afectan:</p>
+                        <ul>
+                            <li><strong>Motilidad gastrointestinal</strong>: Enlentecida por migraña o anticolinérgicos (atropina); acelerada reduce absorción.</li>
+                            <li><strong>Flujo esplácnico</strong>: Hipovolemia lo reduce, enlenteciendo absorción.</li>
+                            <li><strong>Tamaño de partícula/formulación</strong>: Formas sólidas deben desintegrarse/disolver (Figura 4.1: Desintegración aumenta superficie para disolución).</li>
+                            <li><strong>Fisicoquímicos</strong>: Ej. Neomicina (polar) no se absorbe oralmente; tetraciclina forma complejos con calcio, reduciendo absorción.</li>
+                        </ul>
+                        <p>Formulaciones: Tabletas gastrorresistentes se disuelven en intestino; cápsulas combinan partículas rápidas/lentas; formas de liberación sostenida reducen frecuencia de administración.</p>
+                        <p><strong>Sublingual</strong>: Absorción por plexo sublingual, evita primer paso. Irregular si se deglute. Ejemplo: Nitroglicerina.</p>
+                        <p><strong>Rectal</strong>: Efectos sistémicos por irrigación rectal. Más rápida que oral, pero afectada por superficie limitada, líquido o heces.</p>
+                        <p><strong>Intramuscular</strong>: Absorción rápida por irrigación muscular (glúteos, deltoides).</p>
+                        <p><strong>Subcutánea</strong>: Más lenta por menor vascularización y riqueza en grasa.</p>
+                        <h5 id="biodisponibilidad">Biodisponibilidad y Efecto de Primer Paso</h5>
+                        <p>Biodisponibilidad es la proporción de fármaco que alcanza la circulación sistémica tras absorción y metabolismo presistémico. El efecto de primer paso es la inactivación en pared intestinal/hígado antes de la circulación sistémica. Fármacos con alto efecto de primer paso (Tabla 4.1) requieren dosis orales mayores:</p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Analgésicos</th>
+                                    <th>Antidepresivos</th>
+                                    <th>Cardiovasculares</th>
+                                    <th>Otros</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Fenacetina</td>
+                                    <td>Desipramina</td>
+                                    <td>Lidocaína</td>
+                                    <td>Hidrocortisona</td>
+                                </tr>
+                                <tr>
+                                    <td>Meperidina</td>
+                                    <td>Imipramina</td>
+                                    <td>Labetalol</td>
+                                    <td>Pentazocina</td>
+                                </tr>
+                                <tr>
+                                    <td>Morfina</td>
+                                    <td>Nortriptilina</td>
+                                    <td>Metoprolol</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Propoxifeno</td>
+                                    <td></td>
+                                    <td>Nitroglicerina</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Salicilamida</td>
+                                    <td></td>
+                                    <td>Propranolol</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>Verapamilo</td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p>Alimentos pueden aumentar, disminuir o no modificar la absorción.</p>
+                    </div>
+                </div>
+
+                <div id="distribucion" class="card mb-4">
+                    <div class="card-header">
+                        Distribución
+                    </div>
+                    <div class="card-body">
+                        <p>El fármaco alcanza el líquido extravascular y tejidos vía circulación, de forma reversible (distribución) o irreversible (eliminación). (Figura 4.2: Distribución a líquido extravascular, tejidos, sitios de eliminación).</p>
+                        <h5 id="etapas-distribucion">Etapas de la Distribución</h5>
+                        <ol>
+                            <li><strong>Transporte en sangre</strong>: Fármacos libres o unidos a proteínas plasmáticas/hematíes. Solo la forma libre actúa, se almacena o se elimina.</li>
+                            <li><strong>Abandono de la circulación</strong>: Depende de gasto cardíaco y flujo regional. Equilibrio entre sangre y espacio extravascular.</li>
+                            <li><strong>Retorno a la sangre</strong>: Tejidos como grasa actúan como reservorios, liberando fármaco lentamente, prolongando efectos.</li>
+                        </ol>
+                        <h5 id="volumen-distribucion">Volumen de Distribución</h5>
+                        <p>Volumen virtual donde se distribuye el fármaco, calculado como:</p>
+                        <p>\( V_d (\text{L/kg}) = \frac{\text{Dosis (mg/kg)}}{\text{Concentración plasmática (mg/L)}} = \frac{D}{C_0} \)</p>
+                        <p>\( C_0 \): Concentración inicial extrapolada a \( t=0 \) (Figura 4.3: Escala logarítmica para concentraciones plasmáticas). No refleja dilución simple, sino unión a tejidos. Factores: pKa, partición en grasa, flujo regional.</p>
+                        <p><strong>Interpretación</strong>:</p>
+                        <ul>
+                            <li>\( V_d \approx 0.6 \, \text{L/kg} \): Distribución en agua intercambiable (plasma, intersticial, citosólica).</li>
+                            <li>\( V_d > 0.6 \, \text{L/kg} \): Alta unión tisular, baja concentración plasmática (ej. claritromicina, \( V_d = 2.6 \, \text{L/kg} \)).</li>
+                            <li>\( 0.1 < V_d < 0.6 \, \text{L/kg} \): Difusión a intersticial, no celular (ej. cetirizina, \( V_d = 0.4 \, \text{L/kg} \)).</li>
+                            <li>\( V_d \approx 0.1 \, \text{L/kg} \): Unido a proteínas plasmáticas (ej. piroxicam, \( V_d = 0.14 \, \text{L/kg} \)).</li>
+                        </ul>
+                        <p>Útil para calcular dosis de ataque: \( \text{Dosis} = \frac{V_d \times \text{Concentración deseada}}{F} \), donde \( F \) es la biodisponibilidad (Figura 4.4: Dosis de ataque alcanza rápidamente rango terapéutico).</p>
+                    </div>
+                </div>
+
+                <div id="metabolismo" class="card mb-4">
+                    <div class="card-header">
+                        Metabolismo
+                    </div>
+                    <div class="card-body">
+                        <p>Transforma fármacos liposolubles en hidrosolubles para excreción, principalmente en hígado, mediante reacciones de fase I (no sintéticas) y fase II (sintéticas).</p>
+                        <h5 id="fase-i">Reacciones de Fase I</h5>
+                        <p><strong>Oxidación</strong>: Catalizada por oxidasas microsomales (citocromo P450, b5). Oxida alifáticos, aromáticos, esteroides, prostaglandinas. Ejemplos: diazepam → nordiazepam → oxazepam; L-dopa → dopamina. Puede generar metabolitos activos o tóxicos (paracetamol → epóxidos). Otros: digoxina, barbitúricos, anfetaminas, morfina, codeína.</p>
+                        <p><strong>Reducción</strong>: Microsomal, rara (ej. cloranfenicol).</p>
+                        <p><strong>Hidrólisis</strong>: No microsomal, en tubo digestivo, hígado, plasma. Ejemplos: acetilcolina (esterasas), lidocaína (amidasas), insulina (peptidasas). Limita vía oral.</p>
+                        <h5 id="fase-ii">Reacciones de Fase II</h5>
+                        <p>Conjugan fármacos/metabolitos con sustratos endógenos, aumentando polaridad y peso molecular, facilitando excreción. Tipos:</p>
+                        <ol>
+                            <li><strong>Glucuronoconjugación</strong>: Microsomal, común. Ejemplos: morfina, cloranfenicol.</li>
+                            <li><strong>Acetilación</strong>: Ejemplos: isoniacida, hidralacina, sulfas, procainamida.</li>
+                            <li><strong>Sulfoconjugación</strong>: Sulfato con alcoholes/fenoles, excreción urinaria rápida.</li>
+                            <li><strong>Metilación</strong>: Ejemplos: tiouracilo, niacinamida, catecolaminas.</li>
+                            <li><strong>Conjugación con aminoácidos</strong>: Glutamina/glicina, excreción urinaria.</li>
+                        </ol>
+                        <h5 id="factores-metabolismo">Factores que Afectan el Metabolismo</h5>
+                        <p><strong>Edad</strong>: Neonatos (30% capacidad, sin glucuronoconjugación), ancianos (menor flujo hepático).</p>
+                        <p><strong>Genéticos</strong>: Acetilación variable (acetiladores lentos/rápidos). Ejemplos: isoniacida, hidralacina, nitrazepam, dapsone, sulfasalazina. Acetiladores lentos requieren dosis menores.</p>
+                        <p><strong>Inducción enzimática</strong>: Aumenta síntesis de enzimas. Ejemplos: fenobarbital (autometabolismo, afecta anticonceptivos), carbamacepina, rifampicina, griseofulvina, fenitoína. No medicamentos: humo de cigarro (teofilina).</p>
+                        <p><strong>Inhibición enzimática</strong>: Reduce metabolismo. Ejemplos: eritromicina (aumenta carbamazepina, toxicidad), cloranfenicol, cimetidina, disulfiram, isoniacida, ciprofloxacina.</p>
+                        <p>Cinética de primer orden (proporcional a concentración), salvo alcohol, fenitoína, aspirina (orden cero a dosis altas).</p>
+                    </div>
+                </div>
+
+                <div id="excrecion" class="card mb-4">
+                    <div class="card-header">
+                        Excreción
+                    </div>
+                    <div class="card-body">
+                        <p>Elimina fármacos/metabolitos sin modificar su estructura, principalmente vía hepática (bilis) o renal.</p>
+                        <h5 id="excrecion-renal">Excreción Renal</h5>
+                        <p><strong>Filtración glomerular</strong>: Fármacos libres se filtran; unidos a proteínas permanecen en circulación.</p>
+                        <p><strong>Secreción activa</strong>: Ácidos/bases débiles en túbulo proximal. Ejemplo: Penicilinas.</p>
+                        <p><strong>Reabsorción pasiva</strong>: Forma no ionizada se reabsorbe (pH-dependiente). Alcalinización de orina aumenta excreción de ácidos débiles; acidificación, de bases débiles.</p>
+                        <h5 id="excrecion-biliar">Excreción Biliar y Fecal</h5>
+                        <p>Metabolitos hepáticos se excretan por bilis, eliminados en heces o reabsorbidos (circulación enterohepática, ej. glucurónidos hidrolizados en intestino).</p>
+                        <h5 id="otras-vias">Otras Vías</h5>
+                        <p>Saliva, sudor, lágrimas: Insignificantes cuantitativamente. Leche materna: Relevante por efectos en lactantes.</p>
+                        <h5 id="aclaramiento">Aclaramiento</h5>
+                        <p>Volumen de plasma depurado por unidad de tiempo. Aclaramiento total (\( \text{Acl}_{\text{tot}} \)) es la suma de renal (\( \text{Acl}_{\text{ren}} \)) y hepático (\( \text{Acl}_{\text{hep}} \)):</p>
+                        <p>\( \text{Acl}_{\text{tot}} = \frac{\text{Eliminación}_{\text{tot}}}{\text{Concentración plasmática}} \)</p>
+                        <p>Tabla 4.2: Aclaramiento de medicamentos:</p>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Medicamento</th>
+                                    <th>Aclaramiento total (mL/min)</th>
+                                    <th>% Aclaramiento renal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Amikacina</td><td>100</td><td>94-98</td></tr>
+                                <tr><td>Digoxina</td><td>75</td><td>50-70</td></tr>
+                                <tr><td>Fenobarbital</td><td>4</td><td>25</td></tr>
+                                <tr><td>Gentamicina</td><td>60</td><td>>95</td></tr>
+                                <tr><td>Teofilina</td><td>36</td><td><10</td></tr>
+                                <tr><td>Tobramicina</td><td>70</td><td>>95</td></tr>
+                                <tr><td>Ácido valproico</td><td>7</td><td><10</td></tr>
+                            </tbody>
+                        </table>
+                        <h5 id="vida-media">Vida Media</h5>
+                        <p>Tiempo para que la concentración plasmática caiga a la mitad. Calculada por curva exponencial negativa (Figura 4.5):</p>
+                        <p>\( C = C_0 e^{-kt} \)</p>
+                        <p>Donde \( t_{1/2} = \frac{0.693}{k_e} \), y \( k_e = \frac{\text{Acl}}{V_d} \).</p>
+                        <p>Así: \( t_{1/2} = \frac{0.693 V_d}{\text{Acl}} \).</p>
+                        <p>Implicaciones: Inversamente proporcional a \( k_e \), independiente de la dosis. Proporcional a \( V_d \), inversa a aclaramiento. Ejemplo: A 1, 2, 3, 4 vidas medias, queda 50%, 25%, 12.5%, 6.25% de la concentración inicial. Sin efecto tras 2-3 vidas medias.</p>
+                    </div>
+                </div>
+
+                <div id="aplicaciones-clinicas" class="card mb-4">
+                    <div class="card-header">
+                        Aplicaciones Clínicas
+                    </div>
+                    <div class="card-body">
+                        <p>La farmacocinética guía la dosificación para mantener concentraciones dentro de la ventana terapéutica (Figura 4.4: Umbral terapéutico a concentración máxima). La ventana varía por resistencia, sinergismo o margen de seguridad (ej. teofilina, más estrecha en niños).</p>
+                        <h5 id="inicio-tratamiento">Inicio del Tratamiento</h5>
+                        <p>La velocidad para alcanzar el estado de equilibrio (tras 4 vidas medias) depende de \( t_{1/2} \). Dosis de ataque acelera el proceso (Figura 4.6).</p>
+                        <h5 id="estado-equilibrio">Tratamiento en Estado de Equilibrio</h5>
+                        <p>Concentración plasmática proporcional a dosis diaria (lineal). Mayor frecuencia de administración reduce fluctuaciones; infusión continua las elimina. Cambios de dosis requieren 4 vidas medias para nuevo equilibrio.</p>
+                        <h5 id="cese-tratamiento">Cese del Tratamiento</h5>
+                        <p>En cinética de primer orden, concentración cae 50% por vida media (Figura 4.7). Ejemplo: Concentración inicial 300 µg/mL, umbral 75 µg/mL, \( t_{1/2} = 8 \, \text{h} \), efecto cesa tras 16 h. En orden cero (fenitoína, dicumarol, probenecid), eliminación constante, riesgo de acumulación si la dosis excede la eliminación.</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="../index.html" class="btn btn-outline-primary btn-sm">🏠 Inicio</a>
+                    <a href="res-general.html" class="btn btn-outline-primary btn-sm">📄 Resúmenes</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer text-center py-3 mt-5">
+        <p>FarmaLite Beta 1.9.2 — Hecho con ❤️ en Cuba</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('../serviceWorker.js')
+                    .then(reg => console.log('Service Worker registrado'))
+                    .catch(err => console.log('Error al registrar Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>
