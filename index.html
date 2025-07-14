@@ -1,20 +1,54 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="font-medium">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FarmaLite v5</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>FarmaLite</title>
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3f51b5">
+    <link rel="icon" href="icons/icon-192x192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>FarmaLite</h1>
-        <button id="theme-toggle">🌙</button>
+        <button id="menu-toggle" aria-label="Abrir menú">☰</button>
+        <h1 id="app-title">FarmaLite</h1>
+        <div class="header-right-controls">
+            <button id="theme-toggle" aria-label="Cambiar tema">🌙</button>
+            <button id="font-size-toggle" aria-label="Cambiar tamaño de fuente">A</button>
+        </div>
     </header>
-    <main id="content-area">
-        <p>Base funcional. Haz clic en el botón.</p>
-    </main>
-    <script src="ui.js"></script>
+    <nav id="side-menu">
+        <div class="menu-content">
+            <div class="menu-title">📱 FarmaLite</div>
+            <ul>
+                <li><a href="#" class="menu-item" data-section="home">🏠 Inicio</a></li>
+                <li class="menu-category">
+                    <div class="category-header"><span>📚 Farmacología General</span><span class="expand-icon">+</span></div>
+                    <ul class="submenu">
+                        <li><a href="#" class="menu-item" data-section="introduccion">Introducción</a></li>
+                        <li><a href="#" class="menu-item" data-section="bases">Bases científicas</a></li>
+                        <li><a href="#" class="menu-item" data-section="vias">Vías de administración</a></li>
+                    </ul>
+                </li>
+                <li class="menu-category">
+                    <div class="category-header"><span>🧪 Farmacología Clínica</span><span class="expand-icon">+</span></div>
+                    <ul class="submenu">
+                         <li><a href="#" class="menu-item" data-section="antimicrobianos">Antimicrobianos</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="menu-footer">Versión 5.0 - Estable</div>
+    </nav>
+    <main id="content-area"></main>
+    <button id="lovable-btn" aria-label="Mensaje de Lovable">🤖</button>
+    <div id="lovable-tooltip"></div>
+    <div id="overlay"></div>
+    <script src="ui.js" type="module"></script>
 </body>
 </html>
