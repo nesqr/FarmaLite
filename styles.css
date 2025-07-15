@@ -1,20 +1,22 @@
-/* --- ESTILOS COMPLETOS PARA FARMA-LITE --- */
+/* --- ESTILOS COMPLETOS Y FINALES PARA FARMA-LITE --- */
 
 /* 1. Variables y Estilos Base */
 :root {
     --bg-color: #f7f7f7;
     --card-bg: #ffffff;
     --text-color: #1a1a1a;
-    --text-light-color: #6c757d;
+    --text-light-color: #555;
     --header-color: #3f51b5;
     --accent-color: #3f51b5;
     --accent-hover-color: #303f9f;
-    --shadow-color: rgba(0, 0, 0, 0.1);
+    --shadow-color: rgba(90, 110, 130, 0.12);
     --overlay-color: rgba(0, 0, 0, 0.5);
     --border-color: #e0e0e0;
+    --correct-color: #4CAF50;
+    --incorrect-color: #F44336;
     --font-main: 'Poppins', sans-serif;
     --header-height: 60px;
-    --border-radius: 12px;
+    --border-radius: 16px;
     --menu-width: 280px;
     --transition-speed: 0.3s;
 }
@@ -23,7 +25,7 @@ body.dark-mode {
     --bg-color: #121212;
     --card-bg: #1e1e1e;
     --text-color: #e0e0e0;
-    --text-light-color: #a0a0b0;
+    --text-light-color: #aaa;
     --header-color: #1e1e1e;
     --border-color: #333;
     --shadow-color: rgba(0, 0, 0, 0.25);
@@ -51,7 +53,7 @@ body.menu-open {
     overflow: hidden; 
 }
 
-/* 2. Cabecera y Menú Lateral */
+/* 2. Cabecera y Controles */
 header {
     position: fixed;
     top: 0; left: 0; width: 100%;
@@ -87,10 +89,15 @@ header {
 #theme-toggle { font-size: 1.6rem; }
 #font-size-toggle { font-weight: bold; font-size: 1.2rem; }
 
+/* 3. Menú Lateral y Overlay */
 main#content-area {
     padding: calc(var(--header-height) + 1.5rem) 1.5rem;
 }
-
+body.menu-open main#content-area {
+    filter: blur(4px) brightness(0.7);
+    transform: scale(0.98);
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
 #side-menu {
     position: fixed;
     top: 0; left: 0;
@@ -107,9 +114,70 @@ main#content-area {
 #side-menu.is-open { 
     transform: translateX(0); 
 }
-/* ... (resto de estilos del menú que ya teníamos) ... */
-.menu-title, .menu-content, .menu-item, .menu-category, .menu-footer { /* ... */ }
-
+.menu-title {
+    padding: 1.2rem 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--header-color);
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+}
+body.dark-mode .menu-title { 
+    color: var(--accent-color); 
+}
+.menu-content { 
+    flex-grow: 1; 
+    overflow-y: auto; 
+}
+.menu-content ul { 
+    list-style: none; 
+    padding: 0;
+}
+.menu-item {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color var(--transition-speed);
+}
+.menu-item:hover { 
+    background-color: var(--bg-color); 
+}
+.menu-category .category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+.menu-category .expand-icon {
+    transition: transform var(--transition-speed);
+    font-weight: bold;
+}
+.menu-category.open .expand-icon { 
+    transform: rotate(45deg); 
+}
+.menu-category .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out;
+    background-color: color-mix(in srgb, var(--text-color) 3%, var(--card-bg));
+}
+.menu-category .submenu a {
+    padding-left: 2.5rem;
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: var(--text-light-color);
+}
+.menu-footer {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-light-color);
+    border-top: 1px solid var(--border-color);
+}
 #overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -124,14 +192,12 @@ main#content-area {
     visibility: visible; 
 }
 
-
-/* 3. Estilos para el Nuevo Dashboard de Inicio */
+/* 4. Estilos para el Nuevo Dashboard de Inicio */
 #home-dashboard {
     display: grid;
     gap: 1.5rem;
     grid-template-columns: 1fr;
 }
-/* Para pantallas más grandes, creamos un grid más complejo */
 @media (min-width: 768px) {
     #home-dashboard {
         grid-template-columns: repeat(2, 1fr);
@@ -147,34 +213,47 @@ main#content-area {
     background-color: var(--card-bg);
     border-radius: var(--border-radius);
     padding: 1.5rem;
-    box-shadow: 0 4px 12px var(--shadow-color);
+    box-shadow: 0 4px 15px var(--shadow-color);
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--shadow-color);
 }
 .card-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--header-color);
-}
-body.dark-mode .card-title {
+    margin-bottom: 0.75rem;
     color: var(--accent-color);
 }
 .card-content { 
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text-light-color);
     flex-grow: 1;
 }
-.dashboard-card .btn {
+.btn {
+    display: inline-block;
+    background-color: var(--accent-color);
+    color: white !important;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
     margin-top: 1rem;
-    width: fit-content;
-    align-self: flex-start;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+.btn:hover {
+    background-color: var(--accent-hover-color);
 }
 
-/* Tarjetas especiales que ocupan más espacio */
 .welcome-card, .wide-card {
-    grid-column: 1 / -1; /* Ocupa todas las columnas */
+    grid-column: 1 / -1;
 }
 .welcome-card {
     padding: 2rem;
@@ -182,19 +261,8 @@ body.dark-mode .card-title {
     background: linear-gradient(135deg, var(--header-color), var(--accent-hover-color));
     color: white;
 }
-.welcome-card h2 {
-    font-size: 1.8rem;
-    margin: 0;
-    font-weight: 600;
-}
-.welcome-card p {
-    font-size: 1rem;
-    opacity: 0.9;
-    margin-top: 0.25rem;
-}
-body.dark-mode .welcome-card h2 {
-    color: white;
-}
+.welcome-card h2 { font-size: 1.8rem; margin: 0; color: white; }
+.welcome-card p { font-size: 1rem; opacity: 0.9; margin-top: 0.25rem; }
 
 .explorar-grid {
     display: grid;
@@ -218,17 +286,23 @@ body.dark-mode .welcome-card h2 {
     transform: translateY(-2px);
 }
 
-/* 4. Botón Lovable y Pie de Página */
+/* 5. Pie de Página y Botón Lovable */
+.pie-de-pagina {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    font-size: 0.8rem;
+    color: var(--text-light-color);
+}
 #lovable-btn {
     position: fixed;
     bottom: 1.5rem; right: 1.5rem;
-    width: 60px; /* Más grande */
+    width: 60px;
     height: 60px;
     background-color: var(--accent-color);
     color: white;
     border: none;
     border-radius: 50%;
-    font-size: 2rem; /* Más grande */
+    font-size: 2rem;
     cursor: pointer;
     box-shadow: 0 4px 10px var(--shadow-color);
     z-index: 999;
@@ -241,11 +315,21 @@ body.dark-mode .welcome-card h2 {
     transform: scale(0.9);
 }
 #lovable-tooltip {
-    /* ... (sin cambios) ... */
+    position: fixed;
+    bottom: 5.5rem; right: 1.5rem;
+    background-color: #333;
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 250px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+    pointer-events: none;
+    z-index: 998;
 }
-.pie-de-pagina {
-    text-align: center;
-    padding: 2rem 1rem 1rem;
-    font-size: 0.8rem;
-    color: var(--text-light-color);
+#lovable-tooltip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
