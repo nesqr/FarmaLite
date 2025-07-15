@@ -1,4 +1,4 @@
-// data/lovable.js
+// data/lovable.js wiiiii
 export const frasesLovable = [
     "Si no sabes la vida media del lorazepam, no lo recetes.",
     "Recuerda: la ignorancia también tiene RAM.",
