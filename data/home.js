@@ -1,32 +1,56 @@
 // data/home.js
-// Contenido para las tarjetas dinámicas de la pantalla de inicio.
+// Contains all the dynamic data needed to populate the new dashboard on the home screen.
 
+// Data for the "Pearl of the Day" card
 export const perlas = [
     "La rifampicina tiñe los fluidos corporales de naranja. No te asustes, no te estás oxidando.",
     "Los IECA producen tos seca porque aumentan los niveles de bradicinina. Simple, pero molesto.",
-    "Nunca des un AINE a un paciente con insuficiencia cardíaca. Es como echarle leña al fuego."
+    "Nunca des un AINE a un paciente con insuficiencia cardíaca. Es como echarle leña al fuego.",
+    "El antídoto del paracetamol, la N-acetilcisteína, actúa reponiendo los niveles de glutatión hepático."
 ];
 
+// Data for the "Featured Card"
 export const fichasDestacadas = [
     {
         titulo: "Betabloqueadores",
         resumen: "Fármacos terminados en '-olol' que antagonizan los receptores beta-adrenérgicos. Clave en cardiología, pero cuidado con los pacientes asmáticos.",
+        seccion: "cardiovascular" // Used by the "Read more" button
+    },
+    {
+        titulo: "Benzodiacepinas",
+        resumen: "Potencian el efecto del neurotransmisor GABA, produciendo sedación, hipnosis, y ansiólisis. Su antídoto es el flumazenilo.",
+        seccion: "sistemaNervioso"
+    }
+];
+
+// Data for the "3-minute review" card.
+export const repasosExamen = [
+    {
+        titulo: "5 Puntos Clave de los Antibióticos",
+        seccion: "antimicrobianos" // ID of the section it links to
+    },
+    {
+        titulo: "Diferencias Esenciales entre IECA y ARA-II",
         seccion: "cardiovascular"
+    },
+    {
+        titulo: "Manejo del Dolor: La Escalera de la OMS",
+        seccion: "dolor"
     }
 ];
 
-export const flashcardsRapidas = [
+// Data for the "Express Trivia" card
+export const triviasExpres = [
     {
-        pregunta: "Fármaco de elección para revertir una sobredosis de opioides.",
-        respuesta: "Naloxona"
-    }
-];
-
-export const preguntasRapidas = [
+        tema: "Betabloqueadores",
+        pregunta_ejemplo: "¿Cuál de estos NO es un betabloqueador cardioselectivo?"
+    },
     {
-        pregunta: "¿Qué efecto adverso se asocia con la amiodarona a largo plazo?",
-        opciones: ["Hipotensión", "Fibrosis pulmonar", "Alopecia"],
-        correcta: 1,
-        explicacion: "La fibrosis pulmonar es uno de los efectos adversos más graves y temidos del uso crónico de amiodarona."
+        tema: "AINES",
+        pregunta_ejemplo: "¿Cuál es el principal riesgo de la combinación de AINES y IECAS?"
+    },
+    {
+        tema: "Anticoagulantes",
+        pregunta_ejemplo: "¿Qué vía de administración se usa para la heparina no fraccionada?"
     }
 ];
