@@ -1,33 +1,32 @@
 // data/home.js
-// Contenido para las tarjetas del dashboard de inicio
+// Contenido para las tarjetas dinámicas de la pantalla de inicio.
 
 export const perlas = [
-    "El omeprazol no 'protege' el estómago, inhibe la bomba de protones H+/K+ ATPasa.",
-    "La vida media del Diazepam es tan larga por sus metabolitos activos, como el Nordazepam.",
-    "Nunca combines un IECA con un ARA-II, el riesgo de hiperpotasemia y fallo renal es muy alto."
+    "La rifampicina tiñe los fluidos corporales de naranja. No te asustes, no te estás oxidando.",
+    "Los IECA producen tos seca porque aumentan los niveles de bradicinina. Simple, pero molesto.",
+    "Nunca des un AINE a un paciente con insuficiencia cardíaca. Es como echarle leña al fuego."
 ];
 
 export const fichasDestacadas = [
     {
-        titulo: "Inhibidores de la ECA (IECA)",
-        resumen: "Fármacos antihipertensivos que bloquean la conversión de angiotensina I a angiotensina II. Su RAM más característico es la tos seca.",
+        titulo: "Betabloqueadores",
+        resumen: "Fármacos terminados en '-olol' que antagonizan los receptores beta-adrenérgicos. Clave en cardiología, pero cuidado con los pacientes asmáticos.",
         seccion: "cardiovascular"
     }
 ];
 
 export const flashcardsRapidas = [
     {
-        pregunta: "¿Qué vía de administración evita completamente el primer paso hepático?",
-        respuesta: "Intravenosa (IV)"
+        pregunta: "Fármaco de elección para revertir una sobredosis de opioides.",
+        respuesta: "Naloxona"
     }
 ];
 
 export const preguntasRapidas = [
     {
-        pregunta: "¿Cuál es el antídoto para la intoxicación por Benzodiacepinas?",
-        opciones: ["Naloxona", "Flumazenilo", "Atropina", "N-acetilcisteína"],
-        correcta: 1, // El índice de la respuesta correcta (Flumazenilo)
-        explicacion: "El Flumazenilo es un antagonista competitivo del receptor GABA-A."
+        pregunta: "¿Qué efecto adverso se asocia con la amiodarona a largo plazo?",
+        opciones: ["Hipotensión", "Fibrosis pulmonar", "Alopecia"],
+        correcta: 1,
+        explicacion: "La fibrosis pulmonar es uno de los efectos adversos más graves y temidos del uso crónico de amiodarona."
     }
 ];
-
