@@ -9,12 +9,12 @@ export const perlas = [
     "El antídoto del paracetamol, la N-acetilcisteína, actúa reponiendo los niveles de glutatión hepático."
 ];
 
-// Para la tarjeta "Ficha Destacada" (si la implementamos en el futuro)
+// Para la funcionalidad futura de "Ficha Destacada"
 export const fichasDestacadas = [
     {
         titulo: "Betabloqueadores",
         resumen: "Fármacos terminados en '-olol' que antagonizan los receptores beta-adrenérgicos. Clave en cardiología, pero cuidado con los pacientes asmáticos.",
-        seccion: "cardiovascular" // Se usa para el botón "Leer más"
+        seccion: "cardiovascular"
     },
     {
         titulo: "Benzodiacepinas",
@@ -23,7 +23,7 @@ export const fichasDestacadas = [
     }
 ];
 
-// Para la tarjeta "Modo Examen en 3 minutos"
+// Para la tarjeta "Modo examen en 3 minutos"
 export const repasosExamen = [
     {
         titulo: "5 Puntos Clave de los Antibióticos",
@@ -39,7 +39,7 @@ export const repasosExamen = [
     }
 ];
 
-// Para la tarjeta "Trivia Exprés Diaria"
+// Para la tarjeta "Trivia exprés diaria"
 export const triviasExpres = [
     {
         tema: "Betabloqueadores",
@@ -52,23 +52,5 @@ export const triviasExpres = [
     {
         tema: "Anticoagulantes",
         pregunta_ejemplo: "¿Qué vía de administración se usa para la heparina no fraccionada?"
-    }
-];
-
-// Estos arrays son para las tarjetas individuales de flashcard y pregunta rápida
-// que teníamos en un diseño anterior, pero es bueno mantenerlos por si los reutilizamos.
-export const flashcardsRapidas = [
-    {
-        pregunta: "Fármaco de elección para revertir una sobredosis de opioides.",
-        respuesta: "Naloxona"
-    }
-];
-
-export const preguntasRapidas = [
-    {
-        pregunta: "¿Cuál es el antídoto para la intoxicación por Benzodiacepinas?",
-        opciones: ["Naloxona", "Flumazenilo", "Atropina", "N-acetilcisteína"],
-        correcta: 1,
-        explicacion: "El Flumazenilo es un antagonista competitivo del receptor GABA-A."
     }
 ];
