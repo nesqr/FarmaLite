@@ -18,60 +18,40 @@
         <button id="menu-toggle" aria-label="Abrir menú">☰</button>
         <h1 id="app-title">FarmaLite</h1>
         <div class="header-right-controls">
-            </div>
+            <button id="theme-toggle" aria-label="Cambiar tema">🌙</button>
+            <button id="font-size-toggle" aria-label="Cambiar tamaño de fuente">A</button>
+        </div>
     </header>
 
     <nav id="side-menu">
-        </nav>
-
-    <main id="content-area">
-        <div id="home-dashboard">
-            <div class="welcome-banner">
-                <h2 id="saludo-usuario">Cargando saludo...</h2>
-            </div>
-
-            <div class="dashboard-card" id="perla-card">
-                <h3 class="card-title">💡 Perla del Día</h3>
-                <p class="card-content" id="perla-text"></p>
-            </div>
-
-            <div class="dashboard-card" id="ultima-visita-card" style="display: none;"> <h3 class="card-title">📚 Continuar donde lo dejaste</h3>
-                <button class="btn" id="continuar-btn">Antimicrobianos – Aminoglucósidos</button>
-            </div>
-
-            <div class="dashboard-card" id="repaso-card">
-                <h3 class="card-title">🧠 Repasa en 3 minutos</h3>
-                <button class="btn">Tengo examen. ¡Dame lo esencial ya!</button>
-            </div>
-            
-            <div class="dashboard-card" id="lovable-home-card">
-                <h3 class="card-title">🤖 Lovable dice...</h3>
-                <p class="card-content" id="lovable-home-frase"></p>
-            </div>
-
-            <div class="dashboard-card" id="entrenamiento-card">
-                <h3 class="card-title">🎲 Entrenamiento exprés</h3>
-                <p class="card-content">3 pregunticas para mantener la dignidad. ¿Te atreves?</p>
-                <button class="btn">Iniciar Trivia</button>
-            </div>
-
-            <div class="dashboard-card" id="explorar-card">
-                <h3 class="card-title">🗂️ Explora Secciones</h3>
-                <div class="explorar-grid">
-                    <button class="seccion-btn">📘 F. General</button>
-                    <button class="seccion-btn">🧬 F. Clínica</button>
-                    <button class="seccion-btn">💬 Lovable</button>
-                    <button class="seccion-btn">🤣 Farmamemes</button>
-                </div>
-            </div>
+        <div class="menu-content">
+            <div class="menu-title">📱 FarmaLite</div>
+            <ul>
+                <li><a href="#" class="menu-item" data-section="home">🏠 Inicio</a></li>
+                <li class="menu-category">
+                    <div class="category-header"><span>📚 Farmacología General</span><span class="expand-icon">+</span></div>
+                    <ul class="submenu">
+                        <li><a href="#" class="menu-item" data-section="introduccion">Introducción</a></li>
+                        <li><a href="#" class="menu-item" data-section="bases">Bases científicas</a></li>
+                    </ul>
+                </li>
+                <li class="menu-category">
+                    <div class="category-header"><span>🧪 Farmacología Clínica</span><span class="expand-icon">+</span></div>
+                    <ul class="submenu">
+                         <li><a href="#" class="menu-item" data-section="antimicrobianos">Antimicrobianos</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-    </main>
+        <div class="menu-footer">Versión Final – por Nesti</div>
+    </nav>
 
-    <div class="pie-de-pagina">
-        Versión 3.2.8 – hecha con cafeína y amor. Por Nesti 💙
-    </div>
-    
+    <main id="content-area"></main>
+
+    <button id="lovable-btn" aria-label="Mensaje de Lovable">🤖</button>
+    <div id="lovable-tooltip"></div>
     <div id="overlay"></div>
+
     <script src="ui.js" type="module"></script>
 </body>
 </html>
