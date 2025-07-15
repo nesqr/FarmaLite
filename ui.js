@@ -1,11 +1,13 @@
-// ui.js (Con TODOS los botones funcionando)
+// ui.js
 
+// Importamos los datos necesarios para la pantalla de inicio desde sus archivos modulares
 import { perlas, fichasDestacadas, flashcardsRapidas, preguntasRapidas } from './data/home.js';
 import { frasesLovable } from './data/lovable.js';
 
+// Todo el código se ejecuta cuando el HTML está completamente cargado y listo
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. ELEMENTOS DEL DOM
+    // --- 1. ELEMENTOS PERSISTENTES DEL DOM ---
     const body = document.body;
     const html = document.documentElement;
     const contentArea = document.getElementById('content-area');
@@ -18,51 +20,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const fontSizeToggle = document.getElementById('font-size-toggle');
     const lovableBtn = document.getElementById('lovable-btn');
     const lovableTooltip = document.getElementById('lovable-tooltip');
-    const homeHTML = `<div class="search-container"><input type="search" id="search-bar" placeholder="Buscar un fármaco, tema..."></div><div id="home-layout"><div class="dashboard-card hero-card" id="ficha-card"><h3 class="card-title" id="ficha-title"></h3><p class="card-content" id="ficha-resumen"></p><button class="btn" id="ficha-btn">Leer más</button></div><div class="secondary-grid"><div class="dashboard-card" id="perla-card"><h3 class="card-title">🧠 Perla del día</h3><p class="card-content" id="perla-text"></p></div><div class="dashboard-card flashcard-container" id="flashcard-card"><div class="flashcard-inner"><div class="flashcard-front"><h3 class="card-title">🎴 Flashcard</h3><p class="card-content" id="flashcard-pregunta"></p><p class="flip-indicator">Toca para ver la respuesta</p></div><div class="flashcard-back"><h3 class="card-title">Respuesta</h3><p class="card-content" id="flashcard-respuesta"></p></div></div></div><div class="dashboard-card" id="pregunta-card"><h3 class="card-title">❓ Pregunta rápida</h3><p class="card-content" id="pregunta-text"></p><div class="options-container" id="pregunta-opciones"></div><p class="feedback" id="pregunta-feedback"></p></div><div class="dashboard-card" id="lovable-card"><h3 class="card-title">💬 Lovable dice...</h3><p class="card-content" id="lovable-frase"></p></div></div></div>`;
 
-    // 2. FUNCIONES
+    // Plantilla HTML del dashboard para poder reconstruirlo dinámicamente
+    const homeHTML = `
+        <div class="search-container"><input type="search" id="search-bar" placeholder="Buscar un fármaco, tema..."></div>
+        <div id="home-layout">
+            <div class="dashboard-card hero-card" id="ficha-card"><h3 class="card-title" id="ficha-title"></h3><p class="card-content" id="ficha-resumen"></p><button class="btn" id="ficha-btn">Leer más</button></div>
+            <div class="secondary-grid">
+                <div class="dashboard-card" id="perla-card"><h3 class="card-title">🧠 Perla del día</h3><p class="card-content" id="perla-text"></p></div>
+                <div class="dashboard-card flashcard-container" id="flashcard-card"><div class="flashcard-inner"><div class="flashcard-front"><h3 class="card-title">🎴 Flashcard</h3><p class="card-content" id="flashcard-pregunta"></p><p class="flip-indicator">Toca para ver la respuesta</p></div><div class="flashcard-back"><h3 class="card-title">Respuesta</h3><p class="card-content" id="flashcard-respuesta"></p></div></div></div>
+                <div class="dashboard-card" id="pregunta-card"><h3 class="card-title">❓ Pregunta rápida</h3><p class="card-content" id="pregunta-text"></p><div class="options-container" id="pregunta-opciones"></div><p class="feedback" id="pregunta-feedback"></p></div>
+                <div class="dashboard-card" id="lovable-card"><h3 class="card-title">💬 Lovable dice...</h3><p class="card-content" id="lovable-frase"></p></div>
+            </div>
+        </div>`;
+    
+    // --- 2. FUNCIONES ---
+
     const getRandomItem = (arr) => arr ? arr[Math.floor(Math.random() * arr.length)] : null;
-    const toggleMenu = () => {
-        sideMenu.classList.toggle('is-open');
-        overlay.classList.toggle('is-visible');
-        body.classList.toggle('menu-open');
-    };
-    const applyTheme = (theme) => {
-        body.classList.toggle('dark-mode', theme === 'dark');
-        if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-        localStorage.setItem('theme', theme);
-    };
-    const fontClasses = ['font-small', 'font-medium', 'font-large'];
-    const applyFontSize = (sizeClass) => {
-        html.classList.remove(...fontClasses);
-        html.classList.add(sizeClass);
-        localStorage.setItem('fontSize', sizeClass);
-    };
 
     const renderHomePage = () => {
+        if (!contentArea) return;
         contentArea.innerHTML = homeHTML;
+
+        // Seleccionamos y poblamos los elementos que acabamos de crear
         const perlaText = contentArea.querySelector('#perla-text');
         if (perlaText) perlaText.textContent = getRandomItem(perlas);
+
         const ficha = getRandomItem(fichasDestacadas);
         if (ficha) {
             contentArea.querySelector('#ficha-title').textContent = `📘 ${ficha.titulo}`;
             contentArea.querySelector('#ficha-resumen').textContent = ficha.resumen;
         }
+
         const flashcard = getRandomItem(flashcardsRapidas);
         if (flashcard) {
             contentArea.querySelector('#flashcard-pregunta').textContent = flashcard.pregunta;
             contentArea.querySelector('#flashcard-respuesta').textContent = flashcard.respuesta;
         }
-        contentArea.querySelector('#flashcard-card')?.addEventListener('click', (e) => e.currentTarget.classList.toggle('is-flipped'));
+
         const lovableFraseEl = contentArea.querySelector('#lovable-frase');
         if (lovableFraseEl) lovableFraseEl.textContent = getRandomItem(frasesLovable);
-        contentArea.querySelector('#lovable-card')?.addEventListener('click', () => {
-            if (lovableFraseEl) lovableFraseEl.textContent = getRandomItem(frasesLovable);
-        });
+        
         const pregunta = getRandomItem(preguntasRapidas);
         if (pregunta) {
-            const preguntaText = contentArea.querySelector('#pregunta-text');
-            preguntaText.textContent = pregunta.pregunta;
+            contentArea.querySelector('#pregunta-text').textContent = pregunta.pregunta;
             const opcionesContainer = contentArea.querySelector('#pregunta-opciones');
             opcionesContainer.innerHTML = '';
             pregunta.opciones.forEach((opcion, index) => {
@@ -84,14 +85,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 opcionesContainer.appendChild(button);
             });
         }
-    };
 
+        // Asignamos listeners a los elementos dinámicos que acabamos de crear
+        contentArea.querySelector('#flashcard-card')?.addEventListener('click', e => e.currentTarget.classList.toggle('is-flipped'));
+        contentArea.querySelector('#lovable-card')?.addEventListener('click', () => {
+            if (lovableFraseEl) lovableFraseEl.textContent = getRandomItem(frasesLovable);
+        });
+    };
+    
     const renderTopicPage = (data) => {
-        contentArea.innerHTML = `<div class="topic-page"><h1>${data.titulo}</h1><article class="topic-theory">${data.teoria}</article></div>`;
+        contentArea.innerHTML = `<div class="topic-page"><h1>${data.titulo}</h1><article class="topic-theory">${data.teoria}</article><div class="topic-actions">${data.flashcards?.length ? `<div class="action-card"><h3>🎴 Flashcards</h3><p>${data.flashcards.length} tarjetas.</p><button class="btn">Practicar</button></div>` : ''}${data.test?.length ? `<div class="action-card"><h3>❓ Test</h3><p>${data.test.length} preguntas.</p><button class="btn">Evaluar</button></div>` : ''}</div></div>`;
     };
 
     const renderErrorPage = () => {
-        contentArea.innerHTML = `<div class="topic-page"><h1>🚧 En Construcción</h1></div>`;
+        contentArea.innerHTML = `<div class="topic-page"><h1>🚧 En Construcción</h1><p>El contenido para esta sección estará disponible pronto.</p></div>`;
+    };
+    
+    const toggleMenu = () => {
+        sideMenu.classList.toggle('is-open');
+        overlay.classList.toggle('is-visible');
+        body.classList.toggle('menu-open');
     };
 
     const navigateTo = async (section) => {
@@ -109,8 +122,22 @@ document.addEventListener('DOMContentLoaded', () => {
             renderErrorPage();
         }
     };
+    
+    const applyTheme = (theme) => {
+        body.classList.toggle('dark-mode', theme === 'dark');
+        if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        localStorage.setItem('theme', theme);
+    };
 
-    // 3. EVENT LISTENERS
+    const fontClasses = ['font-small', 'font-medium', 'font-large'];
+    const applyFontSize = (sizeClass) => {
+        html.classList.remove(...fontClasses);
+        html.classList.add(sizeClass);
+        localStorage.setItem('fontSize', sizeClass);
+    };
+
+    // --- 3. EVENT LISTENERS Y INICIALIZACIÓN ---
+
     menuToggle.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu);
 
@@ -129,8 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (submenu) submenu.style.maxHeight = category.classList.contains('open') ? `${submenu.scrollHeight}px` : null;
         });
     });
-    
-    // --- LISTENERS RESTAURADOS ---
+
     themeToggle.addEventListener('click', () => {
         const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
         applyTheme(newTheme);
@@ -158,10 +184,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 4. INICIALIZACIÓN
+    // --- Carga inicial de la aplicación ---
     const savedTheme = localStorage.getItem('theme') || 'light';
     const savedFontSize = localStorage.getItem('fontSize') || 'font-medium';
     applyTheme(savedTheme);
     applyFontSize(savedFontSize);
-    renderHomePage();
+    renderHomePage(); // Siempre empezamos mostrando la pantalla de inicio
+
+    console.log("FarmaLite UI: Todos los sistemas en línea.");
 });
