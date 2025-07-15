@@ -1,125 +1,106 @@
-// ui.js - Versión Completa con todas las funcionalidades integradas
+// ui.js (Final version with correct event listener attachment)
+
+import { perlas, fichasDestacadas, flashcardsRapidas, preguntasRapidas } from './data/home.js';
+import { frasesLovable } from './data/lovable.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. DATOS DE EJEMPLO (Para la pantalla de inicio) ---
-    const perlas = ["La rifampicina se lleva mal con todo. Especialmente con los anticonceptivos.", "Los IECA dan tos. Como tu ex, pero menos emocional."];
-    const frasesLovable = ["Dormir no es opcional. Pero si decides no hacerlo, al menos aprende los efectos del midazolam.", "No lo sabes todo. Pero puedes saber esto.", "Recetar sin saber las interacciones es como mandar un WhatsApp a tu ex. Mala idea."];
-
-    // --- 2. ELEMENTOS DEL DOM ---
+    // --- 1. Persistent DOM Elements ---
     const body = document.body;
-    const html = document.documentElement;
     const contentArea = document.getElementById('content-area');
     const menuToggle = document.getElementById('menu-toggle');
     const sideMenu = document.getElementById('side-menu');
     const overlay = document.getElementById('overlay');
-    const menuItems = document.querySelectorAll('.menu-item');
-    const themeToggle = document.getElementById('theme-toggle');
-    const fontSizeToggle = document.getElementById('font-size-toggle');
+    const menuItems = document.querySelectorAll('.menu-item[data-section]');
 
-    // --- 3. FUNCIONES ---
+    // --- 2. HTML Template for the Homepage ---
+    const homeHTML = `
+        <div class="search-container"><input type="search" id="search-bar" placeholder="Buscar un fármaco, tema..."></div>
+        <div id="home-layout">
+            <div class="dashboard-card hero-card" id="ficha-card">
+                <h3 class="card-title" id="ficha-title"></h3><p class="card-content" id="ficha-resumen"></p><button class="btn" id="ficha-btn">Leer más</button>
+            </div>
+            <div class="secondary-grid">
+                <div class="dashboard-card" id="perla-card"><h3 class="card-title">🧠 Perla del día</h3><p class="card-content" id="perla-text"></p></div>
+                <div class="dashboard-card flashcard-container" id="flashcard-card">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front"><h3 class="card-title">🎴 Flashcard</h3><p class="card-content" id="flashcard-pregunta"></p><p class="flip-indicator">Toca para ver la respuesta</p></div>
+                        <div class="flashcard-back"><h3 class="card-title">Respuesta</h3><p class="card-content" id="flashcard-respuesta"></p></div>
+                    </div>
+                </div>
+                <div class="dashboard-card" id="pregunta-card"><h3 class="card-title">❓ Pregunta rápida</h3><p class="card-content" id="pregunta-text"></p><div class="options-container" id="pregunta-opciones"></div><p class="feedback" id="pregunta-feedback"></p></div>
+                <div class="dashboard-card" id="lovable-card"><h3 class="card-title">💬 Lovable dice...</h3><p class="card-content" id="lovable-frase"></p></div>
+            </div>
+        </div>
+    `;
+
+    // --- 3. Core Functions ---
 
     const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-    // --- Lógica de UI (Menú, Tema, Fuente) ---
     const toggleMenu = () => {
         sideMenu.classList.toggle('is-open');
         overlay.classList.toggle('is-visible');
         body.classList.toggle('menu-open');
     };
 
-    const applyTheme = (theme) => {
-        body.classList.toggle('dark-mode', theme === 'dark');
-        themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
-        localStorage.setItem('theme', theme);
-    };
+    const renderHomePage = () => {
+        contentArea.innerHTML = homeHTML;
 
-    const fontClasses = ['font-small', 'font-medium', 'font-large'];
-    const applyFontSize = (sizeClass) => {
-        html.classList.remove(...fontClasses);
-        html.classList.add(sizeClass);
-        localStorage.setItem('fontSize', sizeClass);
-    };
+        // Populate content
+        const perlaText = contentArea.querySelector('#perla-text');
+        if (perlaText) perlaText.textContent = getRandomItem(perlas);
 
-    // --- Lógica de Contenido y Navegación ---
-    const cambiarNombre = () => {
-        const nombreActual = localStorage.getItem('nombreUsuario') || '';
-        const nuevoNombre = prompt("¿Cómo quieres que te llame?", nombreActual);
-        if (nuevoNombre && nuevoNombre.trim() !== "") {
-            localStorage.setItem('nombreUsuario', nuevoNombre);
-            actualizarSaludo(nuevoNombre);
+        // Attach listeners to the newly created dashboard elements
+        const flashcardCard = contentArea.querySelector('#flashcard-card');
+        if (flashcardCard) {
+            flashcardCard.addEventListener('click', () => {
+                flashcardCard.classList.toggle('is-flipped');
+            });
         }
-    };
-    
-    const actualizarSaludo = (nombre) => {
-        const saludoElement = document.getElementById('saludo-usuario');
-        const subtextoElement = document.getElementById('saludo-subtexto');
-        const saludos = ["¡Vamos al grano, crack!", "¿Listo para farmaceutear?", "Hoy se estudia o se estudia."];
-
-        if (saludoElement) saludoElement.textContent = `Hola, ${nombre}.`;
-        if (subtextoElement) subtextoElement.textContent = getRandomItem(saludos);
-    };
-
-    const initNombre = () => {
-        const nombreGuardado = localStorage.getItem('nombreUsuario');
-        if (nombreGuardado) {
-            actualizarSaludo(nombreGuardado);
-        } else {
-            // Si no hay nombre, se le preguntará al hacer clic en el menú
-            const saludoElement = document.getElementById('saludo-usuario');
-            if(saludoElement) saludoElement.textContent = '¡Bienvenido a FarmaLite!';
-        }
-    };
-    
-    const populateDashboard = () => {
-        const perlaText = document.getElementById('perla-text');
-        if(perlaText) perlaText.textContent = getRandomItem(perlas);
         
-        const lovableHomeFrase = document.getElementById('lovable-home-frase');
-        if(lovableHomeFrase) lovableHomeFrase.textContent = getRandomItem(frasesLovable);
+        // (Add logic for other dashboard cards here as needed)
     };
 
-    // --- 4. ASIGNACIÓN DE EVENT LISTENERS ---
+    const renderTopicPage = (data) => {
+        contentArea.innerHTML = `<div class="topic-page"><h1>${data.titulo}</h1><article class="topic-theory">${data.teoria}</article></div>`;
+    };
 
-    // Listeners persistentes
+    const renderErrorPage = () => {
+        contentArea.innerHTML = `<div class="topic-page"><h1>🚧 En Construcción</h1></div>`;
+    };
+
+    const navigateTo = async (section) => {
+        if (sideMenu.classList.contains('is-open')) toggleMenu();
+
+        if (section === 'home') {
+            renderHomePage();
+            return;
+        }
+
+        try {
+            const path = `./data/FarmacologiaGeneral/${section}.js`;
+            const module = await import(path);
+            renderTopicPage(module[section]);
+        } catch (error) {
+            console.error(`Failed to load section '${section}':`, error);
+            renderErrorPage();
+        }
+    };
+
+    // --- 4. Event Listeners & Initialization ---
+
+    // Attach listeners to persistent elements
     menuToggle.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu);
 
-    themeToggle.addEventListener('click', () => {
-        const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-        applyTheme(newTheme);
-    });
-
-    fontSizeToggle.addEventListener('click', () => {
-        const currentSize = localStorage.getItem('fontSize') || 'font-medium';
-        const currentIndex = fontClasses.indexOf(currentSize);
-        const nextIndex = (currentIndex + 1) % fontClasses.length;
-        applyFontSize(fontClasses[nextIndex]);
-    });
-
-    // Asignar listeners a todos los items del menú
     menuItems.forEach(item => {
-        if (item.dataset.action === "cambiar-nombre") {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleMenu(); // Cierra el menú
-                cambiarNombre(); // Llama a la función para cambiar el nombre
-            });
-        }
-        // Aquí irá la lógica para las otras secciones
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateTo(item.dataset.section);
+        });
     });
 
-    // --- 5. INICIALIZACIÓN ---
-    
-    // Cargar preferencias guardadas
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    const savedFontSize = localStorage.getItem('fontSize') || 'font-medium';
-    applyTheme(savedTheme);
-    applyFontSize(savedFontSize);
-    
-    // Cargar contenido inicial
-    initNombre();
-    populateDashboard();
-
-    console.log("FarmaLite: Todos los sistemas en línea.");
+    // Initial page load
+    renderHomePage();
 });
