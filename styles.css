@@ -1,20 +1,486 @@
-body {
-    padding: 1rem;
-    background-color: #ffffff;
-    color: #1a1a1a;
-    font-family: sans-serif;
-    transition: background-color 0.3s, color 0.3s;
+/* --- ESTILOS COMPLETOS PARA FARMA-LITE --- */
+
+/* 1. Variables y Estilos Base */
+:root {
+    --bg-color: #f7f7f7;
+    --card-bg: #ffffff;
+    --text-color: #1a1a1a;
+    --text-light-color: #6c757d;
+    --header-color: #3f51b5;
+    --accent-color: #3f51b5;
+    --accent-hover-color: #303f9f;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --overlay-color: rgba(0, 0, 0, 0.5);
+    --border-color: #e0e0e0;
+    --correct-color: #4CAF50;
+    --incorrect-color: #F44336;
+    --font-size-small: 14px;
+    --font-size-medium: 16px;
+    --font-size-large: 18px;
+    --font-main: 'Poppins', sans-serif;
+    --header-height: 60px;
+    --border-radius: 12px;
+    --menu-width: 280px;
+    --transition-speed: 0.3s;
 }
+
 body.dark-mode {
-    background-color: #121212;
-    color: #e0e0e0;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --text-light-color: #a0a0b0;
+    --header-color: #1e1e1e;
+    --border-color: #333;
+    --shadow-color: rgba(0, 0, 0, 0.25);
 }
+
+html.font-small { font-size: var(--font-size-small); }
+html.font-medium { font-size: var(--font-size-medium); }
+html.font-large { font-size: var(--font-size-large); }
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+body.menu-open { 
+    overflow: hidden; 
+}
+
+/* 2. Cabecera y Controles */
 header {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    height: var(--header-height);
+    background-color: var(--header-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    z-index: 1000;
+    justify-content: space-between;
+}
+#app-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+.header-right-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.header-right-controls button, #menu-toggle {
+    background: none;
+    border: 1px solid transparent;
+    color: white;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+.header-right-controls button:hover, #menu-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+#menu-toggle {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+#theme-toggle {
+    font-size: 1.6rem;
+}
+#font-size-toggle {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* 3. Menú Lateral y Overlay */
+main#content-area {
+    padding: calc(var(--header-height) + 1.5rem) 1.5rem;
+    transition: filter var(--transition-speed) ease;
+}
+body.menu-open main#content-area {
+    filter: blur(4px) brightness(0.7);
+    transform: scale(0.98);
+}
+#side-menu {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--menu-width);
+    height: 100%;
+    background-color: var(--card-bg);
+    box-shadow: 4px 0 15px var(--shadow-color);
+    transform: translateX(-100%);
+    transition: transform var(--transition-speed) ease-in-out;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+}
+#side-menu.is-open { 
+    transform: translateX(0); 
+}
+.menu-title {
+    padding: 1.2rem 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--header-color);
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+}
+body.dark-mode .menu-title { 
+    color: var(--accent-color); 
+}
+.menu-content { 
+    flex-grow: 1; 
+    overflow-y: auto; 
+}
+.menu-content ul { 
+    list-style: none; 
+    padding-top: 0.5rem;
+}
+.menu-item {
+    display: block;
+    padding: 0.8rem 1.5rem;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color var(--transition-speed);
+}
+.menu-item:hover { 
+    background-color: var(--bg-color); 
+}
+.menu-category .category-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-button {
-    font-size: 1.5rem;
+    padding: 0.8rem 1.5rem;
     cursor: pointer;
+    font-weight: 600;
+}
+.menu-category .expand-icon {
+    transition: transform var(--transition-speed);
+    font-weight: bold;
+}
+.menu-category.open .expand-icon { 
+    transform: rotate(45deg); 
+}
+.menu-category .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out;
+}
+.menu-category .submenu a {
+    padding-left: 2.5rem;
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: var(--text-light-color);
+}
+body.dark-mode .menu-category .submenu a { 
+    color: var(--text-light-color); 
+}
+.menu-footer {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-light-color);
+    border-top: 1px solid var(--border-color);
+}
+#overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: var(--overlay-color);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-speed), visibility var(--transition-speed);
+    z-index: 1500;
+}
+#overlay.is-visible { 
+    opacity: 1; 
+    visibility: visible; 
+}
+
+/* 4. Pantalla de Inicio y Tarjetas */
+.search-container {
+    margin-bottom: 2rem;
+}
+#search-bar {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;    
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-family: var(--font-main);
+}
+#search-bar:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.25);
+}
+#home-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.dashboard-card {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--header-color);
+}
+body.dark-mode .card-title { 
+    color: var(--accent-color); 
+}
+.card-content { 
+    flex-grow: 1; 
+    font-size: 0.95rem; 
+}
+.dashboard-card .btn { 
+    margin-top: 1rem; 
+    width: fit-content; 
+}
+.hero-card {
+    padding: 2rem;
+}
+.hero-card .card-title {
+    font-size: 1.5rem;
+}
+.secondary-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* 5. Estilos de Tarjetas Interactivas */
+.flashcard-container {
+    perspective: 1000px;
+    min-height: 220px;
+    cursor: pointer;
+}
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+.flashcard-container.is-flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+.flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.flashcard-back {
+    transform: rotateY(180deg);
+}
+.flip-indicator {
+    font-size: 0.8rem;
+    color: var(--text-light-color);
+    margin-top: auto;
+    text-align: center;
+}
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+.option-btn {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-color);
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.option-btn:hover:not(:disabled) {
+    background-color: var(--bg-color);
+    border-color: var(--accent-color);
+}
+.option-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.option-btn.correct {
+    background-color: var(--correct-color);
+    border-color: var(--correct-color);
+    color: white;
+    font-weight: bold;
+}
+.option-btn.incorrect {
+    background-color: var(--incorrect-color);
+    border-color: var(--incorrect-color);
+    color: white;
+}
+.feedback {
+    font-size: 0.85rem;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    display: none;
+}
+.feedback.visible {
+    display: block;
+}
+#lovable-card {
+    cursor: pointer;
+}
+
+/* 6. Botón Flotante Lovable */
+#lovable-btn {
+    position: fixed;
+    bottom: 1.5rem; right: 1.5rem;
+    width: 55px; height: 55px;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px var(--shadow-color);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+#lovable-btn:active { 
+    transform: scale(0.9); 
+}
+#lovable-tooltip {
+    position: fixed;
+    bottom: 5.5rem;
+    right: 1.5rem;
+    background-color: #333;
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 250px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+    pointer-events: none;
+    z-index: 998;
+}
+#lovable-tooltip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 7. Estilos para la Página de Contenido de Tema */
+.topic-page {
+    animation: fadeIn 0.5s ease-in-out;
+}
+.topic-page h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--header-color);
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+body.dark-mode .topic-page h1 {
+    color: var(--accent-color);
+}
+.topic-theory {
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+.topic-theory h2 {
+    font-size: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+.topic-theory h3 {
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+.topic-theory p, .topic-theory li {
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+}
+.topic-theory ul {
+    list-style-position: inside;
+    padding-left: 1rem;
+}
+.topic-theory ul ul {
+    padding-left: 1.5rem;
+}
+.topic-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+.action-card {
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px var(--shadow-color);
+}
+.action-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+.action-card p {
+    color: var(--text-light-color);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+.action-card .btn {
+    width: 100%;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
