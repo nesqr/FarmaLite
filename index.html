@@ -28,7 +28,7 @@
             <div class="menu-title">📱 FarmaLite</div>
             <ul>
                 <li><a href="#" class="menu-item" data-section="home">🏠 Inicio</a></li>
-                
+
                 <li class="menu-category">
                     <div class="category-header"><span>📘 Farmacología General</span><span class="expand-icon">+</span></div>
                     <ul class="submenu">
@@ -44,8 +44,16 @@
                         <li><a href="#" class="menu-item" data-section="prescripcion-racional">10. Prescripción Racional</a></li>
                     </ul>
                 </li>
-                
-                <li><a href="#" class="menu-item" data-section="clinica">🧬 Farmacología Clínica</a></li>
+
+                <li class="menu-category">
+                    <div class="category-header"><span>🧪 Farmacología Clínica</span><span class="expand-icon">+</span></div>
+                    <ul class="submenu">
+                        <li><a href="#" class="menu-item" data-section="antimicrobianos">Antimicrobianos</a></li>
+                        <li><a href="#" class="menu-item" data-section="cardiovascular">Cardiovascular</a></li>
+                        <li><a href="#" class="menu-item" data-section="aines-y-dolor">AINEs y Dolor</a></li>
+                    </ul>
+                </li>
+
                 <li><a href="#" class="menu-item" data-section="lovable-responde">💬 Lovable responde</a></li>
                 <li><a href="#" class="menu-item" data-section="farmamemes">🤣 Farmamemes</a></li>
                 <li><a href="#" class="menu-item" data-section="atajos">📓 Mis Atajos</a></li>
@@ -54,18 +62,21 @@
                 <li><a href="#" class="menu-item" data-action="cambiar-nombre">🖊️ Cambiar nombre</a></li>
             </ul>
         </div>
+
         <div class="menu-footer">
-            Versión 3.3.0 – por Nesti
+            Versión 4.0.9 – por Nesti
         </div>
     </nav>
 
-    <main id="content-area">
-        </main>
-    
+    <main id="content-area"></main>
+
+    <button id="lovable-btn" aria-label="Mensaje de Lovable">🤖</button>
+    <div id="lovable-tooltip"></div>
+
     <div class="pie-de-pagina">
-        Hecha con cafeína y amor para las abuelas de Farmacología. Por Nesti 💙
+        Hecha con ganas, humor y una pizca de cafeína. – Nesti ⚕️
     </div>
-    
+
     <div id="overlay"></div>
     <script src="ui.js" type="module"></script>
 </body>
