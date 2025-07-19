@@ -28,7 +28,23 @@
             <div class="menu-title">📱 FarmaLite</div>
             <ul>
                 <li><a href="#" class="menu-item" data-section="home">🏠 Inicio</a></li>
-                <li><a href="#" class="menu-item" data-section="general">📘 Farmacología General</a></li>
+                
+                <li class="menu-category">
+                    <div class="category-header"><span>📘 Farmacología General</span><span class="expand-icon">+</span></div>
+                    <ul class="submenu">
+                        <li><a href="#" class="menu-item" data-section="introduccion">1. Introducción</a></li>
+                        <li><a href="#" class="menu-item" data-section="bases-cientificas">2. Bases Científicas</a></li>
+                        <li><a href="#" class="menu-item" data-section="vias-administracion">3. Vías de Administración</a></li>
+                        <li><a href="#" class="menu-item" data-section="procesos-farmacos">4. Procesos en el Organismo</a></li>
+                        <li><a href="#" class="menu-item" data-section="neurotransmision-snc">5. Neurotransmisión en SNC</a></li>
+                        <li><a href="#" class="menu-item" data-section="teoria-receptores">6. Teoría de Receptores</a></li>
+                        <li><a href="#" class="menu-item" data-section="mediadores-quimicos">7. Mediadores Químicos</a></li>
+                        <li><a href="#" class="menu-item" data-section="reacciones-adversas">8. Reacciones Adversas</a></li>
+                        <li><a href="#" class="menu-item" data-section="farmacovigilancia">9. Farmacovigilancia</a></li>
+                        <li><a href="#" class="menu-item" data-section="prescripcion-racional">10. Prescripción Racional</a></li>
+                    </ul>
+                </li>
+                
                 <li><a href="#" class="menu-item" data-section="clinica">🧬 Farmacología Clínica</a></li>
                 <li><a href="#" class="menu-item" data-section="lovable-responde">💬 Lovable responde</a></li>
                 <li><a href="#" class="menu-item" data-section="farmamemes">🤣 Farmamemes</a></li>
@@ -39,54 +55,12 @@
             </ul>
         </div>
         <div class="menu-footer">
-            Versión 3.1.2 – por Nesti
+            Versión 3.3.0 – por Nesti
         </div>
     </nav>
 
     <main id="content-area">
-        <div id="home-dashboard">
-            <div class="dashboard-card welcome-card">
-                <h2 id="saludo-usuario">¡Hola!</h2>
-                <p id="saludo-subtexto">Lista para una nueva dosis de saber.</p>
-            </div>
-
-            <div class="dashboard-card" id="perla-card">
-                <h3 class="card-title">💡 Perla del Día</h3>
-                <p class="card-content" id="perla-text">Cargando...</p>
-            </div>
-
-            <div class="dashboard-card" id="ultima-visita-card" style="display: none;">
-                <h3 class="card-title">📚 Última sección visitada</h3>
-                <button class="btn" id="continuar-btn">Continuar en: Antimicrobianos</button>
-            </div>
-
-            <div class="dashboard-card wide-card" id="repaso-card">
-                <h3 class="card-title">🧠 Repasa en 3 minutos</h3>
-                <button class="btn">Tengo examen. ¡Dame lo esencial ya!</button>
-            </div>
-            
-            <div class="dashboard-card" id="lovable-home-card">
-                <h3 class="card-title">🤖 Lovable dice...</h3>
-                <p class="card-content" id="lovable-home-frase">Cargando...</p>
-            </div>
-
-            <div class="dashboard-card" id="entrenamiento-card">
-                <h3 class="card-title">🎲 Entrenamiento exprés</h3>
-                <p class="card-content">3 pregunticas para mantener la dignidad. ¿Te atreves?</p>
-                <button class="btn">Iniciar Trivia</button>
-            </div>
-
-            <div class="dashboard-card wide-card" id="explorar-card">
-                <h3 class="card-title">🗂️ Explora Secciones</h3>
-                <div class="explorar-grid">
-                    <button class="seccion-btn">F. General</button>
-                    <button class="seccion-btn">F. Clínica</button>
-                    <button class="seccion-btn">Lovable</button>
-                    <button class="seccion-btn">Farmamemes</button>
-                </div>
-            </div>
-        </div>
-    </main>
+        </main>
     
     <div class="pie-de-pagina">
         Hecha con cafeína y amor para las abuelas de Farmacología. Por Nesti 💙
