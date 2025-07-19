@@ -1,8 +1,8 @@
-// ui.js – versión 4.1.0 (con saludos dinámicos)
+// ui.js – versión 4.3.0 (con funcionalidad de Flashcards y Test)
 
 import { perlas } from './data/home.js';
 import { frasesLovable } from './data/lovable.js';
-import { saludos } from './data/saludos.js'; // <-- NUEVO: Importamos los saludos
+import { saludos } from './data/saludos.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -18,6 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuCategories = document.querySelectorAll('.menu-category');
     const lovableBtn = document.getElementById('lovable-btn');
     const lovableTooltip = document.getElementById('lovable-tooltip');
+
+    let currentTopicData = null; // Guardará los datos del tema actual
 
     const homeHTML = `
         <div id="home-dashboard">
@@ -58,25 +60,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
     
-    // <-- NUEVO: Función para obtener el saludo correcto según la hora
     const obtenerSaludoDelDia = () => {
         const hora = new Date().getHours();
-        if (hora >= 5 && hora < 12) {
-            return getRandomItem(saludos.mañana);
-        } else if (hora >= 12 && hora < 20) {
-            return getRandomItem(saludos.tarde);
-        } else {
-            return getRandomItem(saludos.noche);
-        }
+        if (hora >= 5 && hora < 12) return getRandomItem(saludos.mañana);
+        else if (hora >= 12 && hora < 20) return getRandomItem(saludos.tarde);
+        else return getRandomItem(saludos.noche);
     };
 
     const renderHomePage = () => {
+        currentTopicData = null;
         contentArea.innerHTML = homeHTML;
         initNombre();
         populateDashboard();
     };
 
     const renderTopicPage = (data) => {
+        currentTopicData = data; // Guardamos los datos del tema
         contentArea.innerHTML = `
             <div class="topic-page">
                 <h1>${data.titulo}</h1>
@@ -86,16 +85,145 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="action-card">
                             <h3>🎴 Flashcards</h3>
                             <p>${data.flashcards.length} tarjetas.</p>
-                            <button class="btn">Practicar</button>
+                            <button class="btn" id="btn-practicar-flashcards">Practicar</button>
                         </div>` : ''}
                     ${data.test?.length ? `
                         <div class="action-card">
                             <h3>❓ Test</h3>
                             <p>${data.test.length} preguntas.</p>
-                            <button class="btn">Evaluar</button>
+                            <button class="btn" id="btn-evaluar-test">Evaluar</button>
                         </div>` : ''}
                 </div>
             </div>`;
+
+        // Conectar funcionalidad a los botones recién creados
+        const btnPracticar = document.getElementById('btn-practicar-flashcards');
+        if (btnPracticar) {
+            btnPracticar.addEventListener('click', () => renderFlashcardsPage(data.flashcards));
+        }
+
+        const btnEvaluar = document.getElementById('btn-evaluar-test');
+        if (btnEvaluar) {
+            btnEvaluar.addEventListener('click', () => renderTestPage(data.test));
+        }
+    };
+
+    // NUEVA FUNCIÓN para renderizar las Flashcards
+    const renderFlashcardsPage = (flashcards) => {
+        let currentIndex = 0;
+
+        const updateFlashcard = () => {
+            const card = flashcards[currentIndex];
+            contentArea.innerHTML = `
+                <div id="flashcard-container">
+                    <div class="flashcard-header">
+                        <button class="btn" id="btn-volver-tema">← Volver</button>
+                        <span class="card-progress">${currentIndex + 1} / ${flashcards.length}</span>
+                    </div>
+                    <div class="flashcard-box">
+                        <div class="flashcard" id="flashcard">
+                            <div class="flashcard-face flashcard-front">${card.pregunta}</div>
+                            <div class="flashcard-face flashcard-back">${card.respuesta}</div>
+                        </div>
+                    </div>
+                    <div class="flashcard-nav">
+                        <button class="btn" id="btn-anterior" ${currentIndex === 0 ? 'disabled' : ''}>Anterior</button>
+                        <button class="btn" id="btn-siguiente" ${currentIndex === flashcards.length - 1 ? 'disabled' : ''}>Siguiente</button>
+                    </div>
+                </div>`;
+
+            // Añadir event listeners a los nuevos elementos
+            document.getElementById('flashcard').addEventListener('click', (e) => e.currentTarget.classList.toggle('is-flipped'));
+            document.getElementById('btn-volver-tema').addEventListener('click', () => renderTopicPage(currentTopicData));
+            
+            const btnAnterior = document.getElementById('btn-anterior');
+            if(btnAnterior) btnAnterior.addEventListener('click', () => {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    updateFlashcard();
+                }
+            });
+
+            const btnSiguiente = document.getElementById('btn-siguiente');
+            if(btnSiguiente) btnSiguiente.addEventListener('click', () => {
+                if (currentIndex < flashcards.length - 1) {
+                    currentIndex++;
+                    updateFlashcard();
+                }
+            });
+        };
+        updateFlashcard();
+    };
+
+    // NUEVA FUNCIÓN para renderizar el Test
+    const renderTestPage = (test) => {
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const updateTest = () => {
+            if (currentQuestionIndex >= test.length) {
+                renderTestResults();
+                return;
+            }
+
+            const question = test[currentQuestionIndex];
+            contentArea.innerHTML = `
+                <div id="test-container">
+                    <div class="flashcard-header">
+                        <button class="btn" id="btn-volver-tema">← Volver</button>
+                        <span class="card-progress">Pregunta ${currentQuestionIndex + 1} / ${test.length}</span>
+                    </div>
+                    <p class="test-question">${question.pregunta}</p>
+                    <div class="test-options">
+                        ${question.opciones.map(opcion => `<button class="test-option">${opcion}</button>`).join('')}
+                    </div>
+                    <div class="test-feedback"></div>
+                </div>`;
+            
+            document.getElementById('btn-volver-tema').addEventListener('click', () => renderTopicPage(currentTopicData));
+            document.querySelectorAll('.test-option').forEach(button => {
+                button.addEventListener('click', handleAnswer);
+            });
+        };
+
+        const handleAnswer = (e) => {
+            const selectedOption = e.target.textContent;
+            const question = test[currentQuestionIndex];
+
+            document.querySelectorAll('.test-option').forEach(btn => btn.disabled = true); // Deshabilitar opciones
+
+            if (selectedOption === question.respuestaCorrecta) {
+                e.target.classList.add('correct');
+                score++;
+            } else {
+                e.target.classList.add('incorrect');
+            }
+
+            const feedbackDiv = document.querySelector('.test-feedback');
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Siguiente Pregunta →';
+            nextButton.className = 'btn';
+            nextButton.style.marginTop = '1rem';
+            nextButton.addEventListener('click', () => {
+                currentQuestionIndex++;
+                updateTest();
+            });
+            feedbackDiv.appendChild(nextButton);
+        };
+        
+        const renderTestResults = () => {
+            contentArea.innerHTML = `
+                <div class="test-results">
+                    <h2>¡Test completado!</h2>
+                    <p>Tu puntuación final es:</p>
+                    <h3>${score} de ${test.length} correctas</h3>
+                    <button class="btn" id="btn-volver-tema" style="margin-top: 2rem;">Volver al Tema</button>
+                </div>
+            `;
+            document.getElementById('btn-volver-tema').addEventListener('click', () => renderTopicPage(currentTopicData));
+        };
+
+        updateTest();
     };
 
     const renderErrorPage = () => {
@@ -112,14 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         localStorage.setItem('ultimaSeccionVisitada', section);
 
-        const generalSections = [
-            "introduccion", "bases-cientificas", "vias-administracion", "procesos-farmacos",
-            "neurotransmision-snc", "teoria-receptores", "mediadores-quimicos", "reacciones-adversas",
-            "farmacovigilancia", "prescripcion-racional"
-        ];
-        const clinicalSections = [
-            "antimicrobianos", "cardiovascular", "aines-y-dolor"
-        ];
+        const generalSections = [ "introduccion", "bases-cientificas", "vias-administracion", "procesos-farmacos", "neurotransmision-snc", "teoria-receptores", "mediadores-quimicos", "reacciones-adversas", "farmacovigilancia", "prescripcion-racional" ];
+        const clinicalSections = [ "antimicrobianos", "cardiovascular", "aines-y-dolor" ];
 
         let path = "";
 
@@ -148,7 +270,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
-    // <-- MODIFICADO: Ahora el saludo es dinámico
     const actualizarSaludo = (nombre) => {
         const saludoElement = document.getElementById('saludo-usuario');
         const saludoDelDia = obtenerSaludoDelDia();
@@ -157,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // <-- MODIFICADO: Se ajusta el saludo inicial
     const initNombre = () => {
         const nombreGuardado = localStorage.getItem('nombreUsuario');
         const saludoElement = document.getElementById('saludo-usuario');
@@ -189,7 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // ... (El resto del código de los EVENT LISTENERS no necesita cambios)
     menuToggle.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu);
     menuItems.forEach(item => {
@@ -231,10 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
         lovableTooltip.classList.add('show');
         setTimeout(() => lovableTooltip.classList.remove('show'), 4000);
     });
+
     const savedTheme = localStorage.getItem('temaFarmaLite') || 'light';
     const savedFontSize = localStorage.getItem('tamanoLetra') || 'font-medium';
     applyTheme(savedTheme);
     applyFontSize(savedFontSize);
     renderHomePage();
 });
-
