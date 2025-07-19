@@ -414,3 +414,135 @@ body.menu-open {
         max-width: 320px;
     }
 }
+
+
+/* ------------------------------
+   9. Interfaz de Flashcards
+--------------------------------- */
+#flashcard-container {
+    padding: 1rem;
+    text-align: center;
+}
+
+.flashcard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.flashcard-box {
+    perspective: 1000px;
+    height: 300px;
+    cursor: pointer;
+}
+
+.flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-suave);
+}
+
+.flashcard.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.flashcard-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: var(--color-superficie);
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-borde);
+    font-size: 1.2rem;
+}
+
+.flashcard-back {
+    transform: rotateY(180deg);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.flashcard-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+/* ------------------------------
+   10. Interfaz de Test
+--------------------------------- */
+#test-container {
+    padding: 1rem;
+}
+
+.test-question {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.test-options {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.test-option {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    text-align: left;
+    background-color: var(--color-superficie);
+    border: 1px solid var(--color-borde);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transicion-rapida);
+    color: var(--color-texto-principal);
+}
+
+.test-option:hover:not(:disabled) {
+    border-color: var(--color-primario);
+    background-color: var(--color-primario);
+    color: #fff;
+}
+
+.test-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.test-option.correct {
+    background-color: #28a745; /* Verde */
+    color: #fff;
+    border-color: #28a745;
+}
+
+.test-option.incorrect {
+    background-color: #dc3545; /* Rojo */
+    color: #fff;
+    border-color: #dc3545;
+}
+
+.test-feedback {
+    text-align: center;
+}
+
+.test-results {
+    text-align: center;
+    background: var(--color-superficie);
+    padding: 2rem;
+    border-radius: var(--radio-borde);
+}
