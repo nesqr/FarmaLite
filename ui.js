@@ -1,14 +1,11 @@
-// ui.js - Versión final para el nuevo diseño de dashboard
+// ui.js – versión 4.1.0 (con saludos dinámicos)
 
-// 1. IMPORTACIONES
-// El script necesita estos dos archivos en la carpeta /data para funcionar.
-import { perlas, repasosExamen, triviasExpres } from './data/home.js';
+import { perlas } from './data/home.js';
 import { frasesLovable } from './data/lovable.js';
+import { saludos } from './data/saludos.js'; // <-- NUEVO: Importamos los saludos
 
-// 2. EVENTO PRINCIPAL
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 3. ELEMENTOS DEL DOM ---
     const body = document.body;
     const html = document.documentElement;
     const contentArea = document.getElementById('content-area');
@@ -19,8 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('theme-toggle');
     const fontSizeToggle = document.getElementById('font-size-toggle');
     const menuCategories = document.querySelectorAll('.menu-category');
+    const lovableBtn = document.getElementById('lovable-btn');
+    const lovableTooltip = document.getElementById('lovable-tooltip');
 
-    // Plantilla HTML del dashboard
     const homeHTML = `
         <div id="home-dashboard">
             <div class="dashboard-card welcome-card">
@@ -34,39 +32,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h3 class="card-title">📚 Última sección visitada</h3>
                 <button class="btn" id="continuar-btn"></button>
             </div>
-            <div class="dashboard-card wide-card" id="repaso-card">
-                <h3 class="card-title">🧠 Repasa en 3 minutos</h3>
-                <button class="btn"></button>
-            </div>
             <div class="dashboard-card" id="lovable-home-card">
                 <h3 class="card-title">🤖 Lovable dice...</h3>
                 <p class="card-content" id="lovable-home-frase"></p>
             </div>
-            <div class="dashboard-card" id="entrenamiento-card">
-                <h3 class="card-title">🎲 Entrenamiento exprés</h3>
-                <button class="btn"></button>
-            </div>
-            <div class="dashboard-card wide-card" id="explorar-card">
-                <h3 class="card-title">🗂️ Explora Secciones</h3>
-                <div class="explorar-grid">
-                    <button class="seccion-btn">F. General</button>
-                    <button class="seccion-btn">F. Clínica</button>
-                </div>
-            </div>
         </div>`;
 
-    // --- 4. FUNCIONES ---
-
-    const getRandomItem = (arr) => arr ? arr[Math.floor(Math.random() * arr.length)] : null;
-    
     const toggleMenu = () => {
         sideMenu.classList.toggle('is-open');
         overlay.classList.toggle('is-visible');
         body.classList.toggle('menu-open');
     };
 
-    const applyTheme = (theme) => { /* ... (sin cambios) ... */ };
-    const applyFontSize = (sizeClass) => { /* ... (sin cambios) ... */ };
+    const applyTheme = (theme) => {
+        html.classList.remove('light', 'dark');
+        html.classList.add(theme);
+        localStorage.setItem('temaFarmaLite', theme);
+    };
+
+    const applyFontSize = (sizeClass) => {
+        html.classList.remove('font-small', 'font-medium', 'font-large');
+        html.classList.add(sizeClass);
+        localStorage.setItem('tamanoLetra', sizeClass);
+    };
+
+    const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    
+    // <-- NUEVO: Función para obtener el saludo correcto según la hora
+    const obtenerSaludoDelDia = () => {
+        const hora = new Date().getHours();
+        if (hora >= 5 && hora < 12) {
+            return getRandomItem(saludos.mañana);
+        } else if (hora >= 12 && hora < 20) {
+            return getRandomItem(saludos.tarde);
+        } else {
+            return getRandomItem(saludos.noche);
+        }
+    };
 
     const renderHomePage = () => {
         contentArea.innerHTML = homeHTML;
@@ -75,45 +77,96 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderTopicPage = (data) => {
-        contentArea.innerHTML = `<div class="topic-page"><h1>${data.titulo}</h1><article class="topic-theory">${data.teoria}</article><div class="topic-actions">${data.flashcards?.length ? `<div class="action-card"><h3>🎴 Flashcards</h3><p>${data.flashcards.length} tarjetas.</p><button class="btn">Practicar</button></div>` : ''}${data.test?.length ? `<div class="action-card"><h3>❓ Test</h3><p>${data.test.length} preguntas.</p><button class="btn">Evaluar</button></div>` : ''}</div></div>`;
+        contentArea.innerHTML = `
+            <div class="topic-page">
+                <h1>${data.titulo}</h1>
+                <article class="topic-theory">${data.teoria}</article>
+                <div class="topic-actions">
+                    ${data.flashcards?.length ? `
+                        <div class="action-card">
+                            <h3>🎴 Flashcards</h3>
+                            <p>${data.flashcards.length} tarjetas.</p>
+                            <button class="btn">Practicar</button>
+                        </div>` : ''}
+                    ${data.test?.length ? `
+                        <div class="action-card">
+                            <h3>❓ Test</h3>
+                            <p>${data.test.length} preguntas.</p>
+                            <button class="btn">Evaluar</button>
+                        </div>` : ''}
+                </div>
+            </div>`;
     };
 
     const renderErrorPage = () => {
-        contentArea.innerHTML = `<div class="topic-page"><h1>🚧 En Construcción</h1><p>El contenido para esta sección estará disponible pronto.</p></div>`;
+        contentArea.innerHTML = `
+            <div class="topic-page">
+                <h1>🚧 En Construcción</h1>
+                <p>El contenido para esta sección estará disponible pronto.</p>
+            </div>`;
     };
-    
+
     const navigateTo = async (section) => {
         if (sideMenu.classList.contains('is-open')) toggleMenu();
+        if (section === 'home') return renderHomePage();
 
-        if (section === 'home') {
-            renderHomePage();
-            return;
-        }
-        
-        // Guarda la última sección visitada
         localStorage.setItem('ultimaSeccionVisitada', section);
 
+        const generalSections = [
+            "introduccion", "bases-cientificas", "vias-administracion", "procesos-farmacos",
+            "neurotransmision-snc", "teoria-receptores", "mediadores-quimicos", "reacciones-adversas",
+            "farmacovigilancia", "prescripcion-racional"
+        ];
+        const clinicalSections = [
+            "antimicrobianos", "cardiovascular", "aines-y-dolor"
+        ];
+
+        let path = "";
+
+        if (generalSections.includes(section)) {
+            path = `./data/FarmacologiaGeneral/${section}.js`;
+        } else if (clinicalSections.includes(section)) {
+            path = `./data/FarmacologiaClinica/${section}.js`;
+        } else {
+            path = `./data/${section}.js`;
+        }
+
         try {
-            // Esta ruta dinámica es la que hace toda la magia
-            const path = `./data/FarmacologiaGeneral/${section}.js`;
             const module = await import(path);
             renderTopicPage(module[section]);
         } catch (error) {
-            console.error(`Fallo al cargar la sección '${section}':`, error);
+            console.error(`Error cargando la sección '${section}':`, error);
             renderErrorPage();
         }
     };
-    
-    const cambiarNombre = () => { /* ... (sin cambios) ... */ };
-    const actualizarSaludo = (nombre) => { /* ... (sin cambios) ... */ };
 
+    const cambiarNombre = () => {
+        const nuevoNombre = prompt('Para una mejor experiencia, dinos tu nombre:');
+        if (nuevoNombre && nuevoNombre.trim() !== '') {
+            localStorage.setItem('nombreUsuario', nuevoNombre.trim());
+            actualizarSaludo(nuevoNombre.trim());
+        }
+    };
+    
+    // <-- MODIFICADO: Ahora el saludo es dinámico
+    const actualizarSaludo = (nombre) => {
+        const saludoElement = document.getElementById('saludo-usuario');
+        const saludoDelDia = obtenerSaludoDelDia();
+        if (saludoElement) {
+            saludoElement.innerHTML = `${saludoDelDia}<br><span class="user-name">¿Listo, ${nombre}?</span>`;
+        }
+    };
+
+    // <-- MODIFICADO: Se ajusta el saludo inicial
     const initNombre = () => {
         const nombreGuardado = localStorage.getItem('nombreUsuario');
         const saludoElement = document.getElementById('saludo-usuario');
         if (nombreGuardado) {
-            if(saludoElement) saludoElement.textContent = `Hola, ${nombreGuardado}.`;
+            actualizarSaludo(nombreGuardado);
         } else {
-            if (saludoElement) saludoElement.textContent = '¡Bienvenido a FarmaLite!';
+            if (saludoElement) {
+                 saludoElement.textContent = obtenerSaludoDelDia();
+            }
             setTimeout(cambiarNombre, 1500);
         }
     };
@@ -122,35 +175,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const perlaText = document.getElementById('perla-text');
         if (perlaText) perlaText.textContent = getRandomItem(perlas);
 
-        const lovableHomeFrase = document.getElementById('lovable-home-frase');
-        if (lovableHomeFrase) lovableHomeFrase.textContent = getRandomItem(frasesLovable);
+        const lovableFrase = document.getElementById('lovable-home-frase');
+        if (lovableFrase) lovableFrase.textContent = getRandomItem(frasesLovable);
 
-        const ultimaVisita = localStorage.getItem('ultimaSeccionVisitada');
-        const ultimaVisitaCard = document.getElementById('ultima-visita-card');
-        if(ultimaVisita && ultimaVisitaCard) {
-            const continuarBtn = document.getElementById('continuar-btn');
-            // Formateamos el nombre para que se vea mejor
-            const nombreBonito = ultimaVisita.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            continuarBtn.textContent = `Continuar en: ${nombreBonito}`;
-            ultimaVisitaCard.style.display = 'flex';
+        const ultimaSeccion = localStorage.getItem('ultimaSeccionVisitada');
+        const card = document.getElementById('ultima-visita-card');
+        if (ultimaSeccion && card) {
+            const btn = document.getElementById('continuar-btn');
+            const nombreBonito = ultimaSeccion.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            btn.textContent = `Continuar en: ${nombreBonito}`;
+            btn.onclick = () => navigateTo(ultimaSeccion);
+            card.style.display = 'flex';
         }
     };
-    
-    // --- 5. EVENT LISTENERS Y INICIALIZACIÓN ---
 
+    // ... (El resto del código de los EVENT LISTENERS no necesita cambios)
     menuToggle.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu);
-
     menuItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
-            
             const section = item.dataset.section;
             const action = item.dataset.action;
-
-            if (section) {
-                navigateTo(section);
-            } else if (action === "cambiar-nombre") {
+            if (section) navigateTo(section);
+            else if (action === "cambiar-nombre") {
                 toggleMenu();
                 setTimeout(cambiarNombre, 300);
             } else if (action === "mostrar-perla") {
@@ -159,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
     menuCategories.forEach(category => {
         const header = category.querySelector('.category-header');
         header.addEventListener('click', () => {
@@ -168,9 +215,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (submenu) submenu.style.maxHeight = category.classList.contains('open') ? `${submenu.scrollHeight}px` : null;
         });
     });
-    
-    // Aquí irían los listeners de themeToggle y fontSizeToggle
-    
-    // Carga inicial
+    themeToggle.addEventListener('click', () => {
+        const current = html.classList.contains('dark') ? 'light' : 'dark';
+        applyTheme(current);
+    });
+    fontSizeToggle.addEventListener('click', () => {
+        const sizes = ['font-small', 'font-medium', 'font-large'];
+        const current = sizes.find(size => html.classList.contains(size)) || 'font-medium';
+        const next = sizes[(sizes.indexOf(current) + 1) % sizes.length];
+        applyFontSize(next);
+    });
+    lovableBtn.addEventListener('click', () => {
+        const frase = getRandomItem(frasesLovable);
+        lovableTooltip.textContent = frase;
+        lovableTooltip.classList.add('show');
+        setTimeout(() => lovableTooltip.classList.remove('show'), 4000);
+    });
+    const savedTheme = localStorage.getItem('temaFarmaLite') || 'light';
+    const savedFontSize = localStorage.getItem('tamanoLetra') || 'font-medium';
+    applyTheme(savedTheme);
+    applyFontSize(savedFontSize);
     renderHomePage();
 });
+
