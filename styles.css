@@ -1,44 +1,87 @@
+/* ==========================================================================
+   FarmaLite v4.1.0 - Hoja de Estilos Principal
+   ========================================================================== */
+
 /* ------------------------------
-   Estilo General de FarmaLite
+   1. Variables y Estilo Base
 --------------------------------- */
 :root {
+    /* Paleta de Colores (Modo Claro) */
     --color-primario: #3f51b5;
-    --color-secundario: #f5f5f5;
-    --color-texto: #222;
-    --color-fondo: #fff;
-    --color-dark-bg: #1e1e1e;
-    --color-dark-texto: #e5e5e5;
-    --card-radius: 12px;
-    --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    --color-primario-dark: #303f9f;
+    --color-fondo: #f4f6f8;
+    --color-superficie: #ffffff; /* Color de las tarjetas y menú */
+    --color-texto-principal: #1a1a1a;
+    --color-texto-secundario: #555555;
+    --color-borde: #e0e0e0;
+
+    /* Sombras y Bordes */
+    --sombra-suave: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --sombra-media: 0 6px 20px rgba(0, 0, 0, 0.1);
+    --radio-borde: 12px;
+
+    /* Transiciones */
+    --transicion-rapida: all 0.2s ease-in-out;
+    --transicion-normal: all 0.3s ease-in-out;
+}
+
+html.dark {
+    /* Paleta de Colores (Modo Oscuro) */
+    --color-primario: #7986cb;
+    --color-primario-dark: #9fa8da;
+    --color-fondo: #121212;
+    --color-superficie: #1e1e1e;
+    --color-texto-principal: #e5e5e5;
+    --color-texto-secundario: #a0a0a0;
+    --color-borde: #333333;
 }
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background-color: var(--color-fondo);
-    color: var(--color-texto);
-    transition: background-color 0.3s, color 0.3s;
+    color: var(--color-texto-principal);
+    transition: var(--transicion-normal);
+    overflow-x: hidden; /* Previene el desbordamiento horizontal */
 }
 
-.dark-mode {
-    background-color: var(--color-dark-bg);
-    color: var(--color-dark-texto);
-}
+/* Clases para el tamaño de fuente */
+html.font-small { font-size: 14px; }
+html.font-medium { font-size: 16px; }
+html.font-large { font-size: 18px; }
+
 
 /* ------------------------------
-   Cabecera
+   2. Cabecera (Header)
 --------------------------------- */
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--color-primario);
-    color: #fff;
-    padding: 0.8rem 1rem;
+    background-color: var(--color-superficie);
+    color: var(--color-texto-principal);
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--color-borde);
+}
+
+header h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primario);
+}
+
+.header-right-controls {
+    display: flex;
+    gap: 0.5rem;
 }
 
 #menu-toggle,
@@ -46,270 +89,333 @@ header {
 #font-size-toggle {
     background: none;
     border: none;
-    color: #fff;
-    font-size: 1.2rem;
+    color: var(--color-texto-secundario);
+    font-size: 1.5rem;
     cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: var(--transicion-rapida);
 }
 
-.header-right-controls {
-    display: flex;
-    gap: 0.8rem;
+#menu-toggle:hover,
+#theme-toggle:hover,
+#font-size-toggle:hover {
+    background-color: var(--color-fondo);
+    color: var(--color-primario);
 }
+
 
 /* ------------------------------
-   Menú lateral
+   3. Menú Lateral (Sidebar)
 --------------------------------- */
 #side-menu {
     position: fixed;
     top: 0;
-    left: -260px;
-    width: 260px;
+    left: 0;
+    width: 280px;
     height: 100%;
-    background-color: #fff;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-    overflow-y: auto;
-    transition: left 0.3s ease;
-    z-index: 999;
+    background-color: var(--color-superficie);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+    z-index: 1000;
+    box-shadow: var(--sombra-media);
 }
 
 #side-menu.is-open {
-    left: 0;
+    transform: translateX(0);
 }
 
 .menu-content {
     padding: 1rem;
+    overflow-y: auto;
+    flex-grow: 1; /* Permite que el contenido crezca y el pie quede abajo */
 }
 
 .menu-title {
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-primario);
 }
 
-ul {
+#side-menu ul {
     list-style: none;
-    padding-left: 0;
-    margin: 0;
 }
 
-.menu-item {
+#side-menu a.menu-item {
     display: block;
-    padding: 0.6rem;
-    color: #333;
+    padding: 0.8rem 1rem;
+    color: var(--color-texto-secundario);
     text-decoration: none;
-    transition: background 0.2s;
+    transition: var(--transicion-rapida);
+    border-radius: 8px;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
 }
 
-.menu-item:hover {
-    background-color: #eee;
+#side-menu a.menu-item:hover, #side-menu a.menu-item.active {
+    background-color: var(--color-primario);
+    color: #fff;
 }
 
 .menu-footer {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     padding: 1rem;
     text-align: center;
-    color: #666;
-    border-top: 1px solid #ddd;
+    color: var(--color-texto-secundario);
+    border-top: 1px solid var(--color-borde);
+    flex-shrink: 0; /* Evita que se encoja */
 }
 
-.category-header {
-    font-weight: 500;
+/* Submenús desplegables */
+.menu-category .category-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     cursor: pointer;
-    padding: 0.6rem;
-    background-color: #f0f0f0;
-    margin-top: 0.5rem;
+    padding: 0.8rem 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+.menu-category .category-header:hover {
+    background-color: var(--color-fondo);
+}
+
+.menu-category .expand-icon {
+    transition: transform 0.3s ease;
+}
+
+.menu-category.open .expand-icon {
+    transform: rotate(45deg);
 }
 
 .submenu {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
+    padding-left: 1rem;
 }
 
+/* El JS calculará la altura necesaria */
 .menu-category.open .submenu {
-    max-height: 500px;
+    margin-top: 0.5rem;
 }
 
-.expand-icon {
-    font-weight: bold;
-}
 
 /* ------------------------------
-   Contenido Principal
+   4. Overlay y Estado de Menú Abierto
 --------------------------------- */
-#content-area {
-    padding: 1rem;
-    margin-left: 0;
-    transition: margin-left 0.3s ease;
-}
-
-.menu-open #content-area {
-    margin-left: 260px;
-}
-
-/* ------------------------------
-   Cards del Dashboard
---------------------------------- */
-#home-dashboard {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1rem;
-}
-
-.dashboard-card {
-    background-color: #fff;
-    border-radius: var(--card-radius);
-    box-shadow: var(--card-shadow);
-    padding: 1rem;
-    transition: transform 0.2s ease;
-}
-
-.dark-mode .dashboard-card {
-    background-color: #2e2e2e;
-}
-
-.dashboard-card:hover {
-    transform: scale(1.01);
-}
-
-.card-title {
-    margin-top: 0;
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-.card-content {
-    margin: 0.5rem 0 0 0;
-}
-
-/* ------------------------------
-   Botones y controles
---------------------------------- */
-.btn {
-    background-color: var(--color-primario);
-    color: #fff;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
-    font-weight: 500;
-}
-
-.btn:hover {
-    background-color: #303f9f;
-}
-
-.seccion-btn {
-    background-color: #e0e0e0;
-    border: none;
-    padding: 0.7rem 1rem;
-    border-radius: 8px;
-    margin: 0.3rem;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.dark-mode .seccion-btn {
-    background-color: #444;
-    color: #fff;
-}
-
-.explorar-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
-}
-
-/* ------------------------------
-   Pie de página y Overlay
---------------------------------- */
-.pie-de-pagina {
-    padding: 1rem;
-    font-size: 0.9rem;
-    text-align: center;
-    background-color: #fafafa;
-    color: #444;
-}
-
-.dark-mode .pie-de-pagina {
-    background-color: #121212;
-    color: #aaa;
-}
-
 #overlay {
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
-    background: rgba(0,0,0,0.3);
-    display: none;
-    z-index: 998;
+    background: rgba(0,0,0,0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 999;
 }
 
 #overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Evita el scroll del body cuando el menú está abierto */
+body.menu-open {
+    overflow: hidden;
+}
+
+
+/* ------------------------------
+   5. Contenido Principal
+--------------------------------- */
+#content-area {
+    padding: 1.5rem;
+}
+
+/* Tarjetas del Dashboard */
+#home-dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.dashboard-card {
+    background-color: var(--color-superficie);
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra-suave);
+    padding: 1.5rem;
+    transition: var(--transicion-rapida);
+    border: 1px solid var(--color-borde);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--sombra-media);
+}
+
+.card-title {
+    margin-top: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.card-content {
+    margin: 0;
+    color: var(--color-texto-secundario);
+    line-height: 1.6;
+}
+
+/* Estilo específico para la tarjeta de bienvenida */
+.welcome-card h2 {
+    font-size: 1.3rem;
+    line-height: 1.4;
+    font-weight: 400;
+    color: var(--color-texto-secundario);
+}
+
+.welcome-card .user-name {
     display: block;
+    font-weight: 600;
+    color: var(--color-texto-principal);
+    margin-top: 0.25rem;
+}
+
+/* Estilo para páginas de temas */
+.topic-page h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--color-primario);
+}
+
+.topic-page .topic-theory {
+    background-color: var(--color-superficie);
+    padding: 1.5rem;
+    border-radius: var(--radio-borde);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.topic-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.action-card {
+    background-color: var(--color-superficie);
+    border: 1px dashed var(--color-primario);
+    padding: 1.5rem;
+    border-radius: var(--radio-borde);
+    text-align: center;
 }
 
 /* ------------------------------
-   Lovable Tooltip
+   6. Botones y Controles Flotantes
 --------------------------------- */
+.btn {
+    display: inline-block;
+    background-color: var(--color-primario);
+    color: #fff;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transicion-rapida);
+    font-weight: 600;
+    text-decoration: none;
+    width: 100%;
+}
+
+.btn:hover {
+    background-color: var(--color-primario-dark);
+    transform: scale(1.02);
+}
+
 #lovable-btn {
     position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     background-color: var(--color-primario);
     color: #fff;
     border: none;
     border-radius: 50%;
-    padding: 0.6rem 0.75rem;
-    box-shadow: var(--card-shadow);
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    box-shadow: var(--sombra-media);
     cursor: pointer;
-    z-index: 999;
+    z-index: 950;
+    transition: var(--transicion-rapida);
+}
+
+#lovable-btn:hover {
+    transform: scale(1.1) rotate(15deg);
 }
 
 #lovable-tooltip {
     position: fixed;
-    bottom: 5rem;
+    bottom: 6rem;
     right: 1.5rem;
-    background-color: #333;
-    color: #fff;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
+    background-color: var(--color-texto-principal);
+    color: var(--color-superficie);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radio-borde);
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 1000;
+    transition: var(--transicion-normal);
+    z-index: 951;
     pointer-events: none;
-    max-width: 260px;
+    max-width: 280px;
+    box-shadow: var(--sombra-media);
 }
 
-#lovable-tooltip.is-visible {
+#lovable-tooltip.show { /* Usamos .show como en el JS */
     opacity: 1;
     transform: translateY(0);
 }
 
-/* ------------------------------
-   Font Sizes
---------------------------------- */
-.font-small { font-size: 14px; }
-.font-medium { font-size: 16px; }
-.font-large { font-size: 18px; }
 
 /* ------------------------------
-   Responsive
+   7. Pie de Página
+--------------------------------- */
+.pie-de-pagina {
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    text-align: center;
+    color: var(--color-texto-secundario);
+    border-top: 1px solid var(--color-borde);
+    background-color: var(--color-superficie);
+}
+
+
+/* ------------------------------
+   8. Adaptabilidad (Responsive Design)
 --------------------------------- */
 @media (max-width: 768px) {
-    .menu-open #content-area {
+    #content-area {
+        padding: 1rem;
+    }
+
+    .topic-page h1 {
+        font-size: 1.5rem;
+    }
+
+    /* En móvil, el menú no empuja el contenido */
+    body.menu-open #content-area {
         margin-left: 0;
     }
 
     #side-menu {
-        width: 80%;
+        width: 85%;
+        max-width: 320px;
     }
 }
