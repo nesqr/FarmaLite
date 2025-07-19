@@ -1,5 +1,5 @@
 export const introduccion = {
-  // El título que aparecerá en la parte superior de la página
+  // wiiii El título que aparecerá en la parte superior de la página
   titulo: "1. Introducción a la Farmacología",
 
   // El contenido principal de la sección
